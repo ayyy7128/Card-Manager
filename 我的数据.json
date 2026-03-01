@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "meta": {
+    "name": "我的银行卡数据",
+    "netCNY": 220,
+    "netHKD": 100
+  },
+  "cards": {
+    "mainland": [
+      {"id":"cb2571","bank":"中国银行","tail":"2571","network":"银联","role":"主力消费","status":"active","color":"#c8102e"},
+      {"id":"cmb3933","bank":"招商银行","tail":"3933","network":"银联","role":"次主力消费","status":"active","color":"#e60012"},
+      {"id":"cmb5341","bank":"招商银行","tail":"5341","network":"万事达","role":"境外主力","status":"active","color":"#e60012"},
+      {"id":"citic1966","bank":"中信银行","tail":"1966","network":"万事达","role":"定投卡","status":"active","color":"#c8a951","note":"002460 每3天2元"},
+      {"id":"citic1363","bank":"中信银行","tail":"1363","network":"Visa美元","role":"美元订阅","status":"active","color":"#c8a951"},
+      {"id":"citic2091","bank":"中信银行","tail":"2091","network":"运通","role":"运通轮用","status":"active","color":"#c8a951"},
+      {"id":"ccbsb","bank":"建设银行","tail":"社保","network":"银联","role":"社保绑定","status":"active","color":"#003087"},
+      {"id":"ccb3234","bank":"建设银行","tail":"3234","network":"银联","role":"定投卡","status":"active","color":"#003087","note":"000218周一+288102周四 各5元"},
+      {"id":"icbc7634","bank":"工商银行","tail":"7634","network":"银联","role":"货基循环","status":"active","color":"#c8102e"},
+      {"id":"cib4587","bank":"兴业银行","tail":"4587","network":"银联","role":"🐷 欲望储蓄罐","status":"active","color":"#0066cc"},
+      {"id":"cib3772","bank":"兴业银行","tail":"3772","network":"运通","role":"运通轮用","status":"active","color":"#0066cc"},
+      {"id":"psbc6446","bank":"邮储银行","tail":"6446","network":"万事达","role":"冻结搁置","status":"frozen","color":"#007a33"},
+      {"id":"psbc8888","bank":"邮储银行","tail":"8888","network":"银联","role":"话费绑定","status":"active","color":"#007a33"}
+    ],
+    "hk": [
+      {"id":"hsbc","bank":"香港汇丰","tail":"","network":"账户","role":"每月16日定投","status":"active","color":"#db0011","note":"基金代码 U50012"},
+      {"id":"zabank","bank":"ZA Bank 众安","tail":"","network":"Visa","role":"港币存款计息","status":"active","color":"#00d45e"},
+      {"id":"bochk","bank":"BOCHK 中银香港","tail":"","network":"账户","role":"货基季度申赎","status":"pending","color":"#c8102e"},
+      {"id":"ccbhk","bank":"建行港澳","tail":"","network":"账户","role":"季度小额互转","status":"pending","color":"#003087"},
+      {"id":"welab","bank":"WeLab 汇立","tail":"","network":"万事达","role":"GoSave高息活期","status":"pending","color":"#ff6b35"},
+      {"id":"airstar","bank":"天星 Airstar","tail":"","network":"Visa","role":"灵活定期滚存","status":"pending","color":"#6c35de"},
+      {"id":"antbk","bank":"蚂蚁银行香港","tail":"","network":"Visa","role":"AlipayHK消费","status":"pending","color":"#1677ff"}
+    ]
+  },
+  "monthlyTasks": [
+    {"id":"t1","label":"中信 1966 定投扣款","amount":"20元","type":"transfer","day":1},
+    {"id":"t2","label":"建行 3234 定投扣款","amount":"40元","type":"transfer","day":1},
+    {"id":"t3","label":"工行 7634 货基买入","amount":"500元（循环）","type":"invest","day":1},
+    {"id":"t4","label":"招商 5341 境外订阅","amount":"≈15元","type":"transfer","day":1},
+    {"id":"t5","label":"中信 1363 美元订阅","amount":"≈145元","type":"transfer","day":1},
+    {"id":"t6","label":"汇丰HK 定投","amount":"100港币","type":"transfer","day":16},
+    {"id":"t7","label":"工行 7634 货基赎回","amount":"500元归还","type":"redeem","day":28},
+    {"id":"t8","label":"中信/兴业运通轮流消费","amount":"各一笔","type":"consume","day":15}
+  ],
+  "quarterlyTasks": [
+    {"id":"q1","label":"中信三张国际卡各消费一笔境外订阅","type":"quarterly","day":1,"months":[1,4,7,10]},
+    {"id":"q2","label":"建行港澳 与内地建行小额港币互转","type":"quarterly","day":1,"months":[1,4,7,10]},
+    {"id":"q3","label":"BOCHK 货币基金申赎一次","type":"quarterly","day":1,"months":[1,4,7,10]},
+    {"id":"q4","label":"ZA Bank 港股ETF小额定投","type":"quarterly","day":1,"months":[1,4,7,10]}
+  ]
+}

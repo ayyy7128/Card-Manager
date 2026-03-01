@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>💳 卡片管家</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="卡片管家">
+<meta name="theme-color" content="#0a0f1e">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0a0f1e;color:#e2e8f0;font-family:'PingFang SC','Noto Sans SC','Helvetica Neue',sans-serif;min-height:100vh}
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:18px 16px 0;border-bottom:1px solid #1e3a5f}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;max-width:480px;margin:0 auto 12px}
+.hdr-title{font-size:20px;font-weight:700}
+.hdr-sub{font-size:11px;color:#7dd3fc;margin-top:2px}
+.hdr-right{display:flex;gap:8px;align-items:center}
+.icon-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:4px;border-radius:6px}
+.icon-btn:active{background:#1e3a5f}
+.tabs{display:flex;max-width:480px;margin:0 auto}
+.tab{flex:1;padding:8px 2px;border:none;border-radius:8px 8px 0 0;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;background:transparent;color:#94a3b8}
+.tab.on{background:#1e40af;color:#fff;font-weight:700}
+/* ── CONTENT ── */
+.content{max-width:480px;margin:0 auto;padding:16px 16px 80px}
+/* ── SECTION ── */
+.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:16px}
+.sec-hdr:first-child{margin-top:0}
+.sec-title{font-weight:700;font-size:15px}
+.cnt{font-size:11px;color:#475569;background:#1e293b;border-radius:20px;padding:1px 8px}
+/* ── CARD ITEM ── */
+.ci{border-radius:12px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
+.ci.s-active{background:linear-gradient(135deg,#0f1f3d,#0a1628);border:1px solid #1e3a5f}
+.ci.s-frozen{opacity:.5;border:1px solid #374151;background:#0c1828}
+.ci.s-pending{border:1px solid #1e293b;background:#0c1828}
+.ci-icon{position:relative;flex-shrink:0;width:40px;height:40px;cursor:pointer}
+.ci-icon-inner{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ci-icon-inner img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.ci-dot{width:20px;height:14px;border-radius:3px}
+.ci-overlay{position:absolute;inset:0;border-radius:10px;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;font-size:15px}
+.ci-icon:active .ci-overlay{display:flex}
+.ci-info{flex:1;min-width:0}
+.ci-name-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ci-name{font-weight:700;font-size:14px}
+.ci-tail{font-size:11px;color:#64748b}
+.ci-meta{display:flex;gap:5px;margin-top:4px;align-items:center}
+.nbadge{font-size:11px;border-radius:4px;padding:1px 6px;font-weight:600}
+.ci-role{font-size:12px;color:#94a3b8}
+.ci-note{font-size:11px;color:#64748b;margin-top:2px}
+.sbtn{font-size:10px;border-radius:5px;padding:2px 7px;border:none;cursor:pointer;font-family:inherit;font-weight:600}
+.sbtn.s-active{background:#14532d;color:#4ade80;border:1px solid #166534}
+.sbtn.s-frozen{background:#374151;color:#9ca3af;border:1px solid #4b5563}
+.sbtn.s-pending{background:#1e3a5f;color:#7dd3fc;border:1px solid #1e4a7f}
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-month{font-size:17px;font-weight:700}
+.cal-arrow{background:none;border:none;color:#7dd3fc;font-size:20px;cursor:pointer;padding:4px 10px;border-radius:8px}
+.cal-arrow:active{background:#1e293b}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dow{text-align:center;font-size:11px;color:#475569;padding:6px 0;font-weight:600}
+.cal-day{min-height:48px;border-radius:8px;padding:4px 2px;cursor:pointer;transition:background .15s;display:flex;flex-direction:column;align-items:center}
+.cal-day:active{background:#1e293b}
+.cal-day.today .cal-dn{background:#1e40af;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.cal-day.other-month{opacity:.3}
+.cal-day.has-tasks{background:#0f1f3d}
+.cal-dn{font-size:13px;font-weight:600;margin-bottom:3px;min-width:24px;text-align:center;line-height:24px}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:36px}
+.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+/* Task list below calendar */
+.cal-task-date{font-size:13px;color:#94a3b8;margin:16px 0 8px;font-weight:600}
+.task-item{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.task-item.done{background:#0a2010;border-color:#166534}
+.tcheck{width:22px;height:22px;border-radius:6px;border:2px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:#fff;transition:all .2s}
+.tcheck.ck{background:#22c55e;border-color:#22c55e}
+.tcheck.ckq{background:#f97316;border-color:#f97316}
+.tbody{flex:1}
+.ttop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tlabel{font-size:14px;font-weight:600}
+.tlabel.done{text-decoration:line-through;color:#4ade80}
+.tlabel.doneq{text-decoration:line-through;color:#fb923c}
+.tamt{font-size:11px;border-radius:5px;padding:2px 7px;font-weight:700;white-space:nowrap}
+.tsub{font-size:11px;color:#475569;margin-top:2px}
+/* legend */
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+/* ── PIGGY ── */
+.pig-hero{background:linear-gradient(135deg,#3f1f60,#1e293b);border-radius:16px;padding:20px;margin-bottom:14px;text-align:center;border:1px solid #6d28d9}
+.pig-total{font-size:36px;font-weight:800;color:#f0c040;letter-spacing:-1px}
+.pig-input-row{display:flex;gap:8px;margin-bottom:6px}
+.pig-input{flex:1;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:10px 13px;color:#e2e8f0;font-size:15px;outline:none;font-family:inherit}
+.pig-desc{width:100%;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:9px 13px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;margin-bottom:10px}
+.pig-btn{background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:10px;color:#fff;padding:10px 16px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit}
+.pig-entry{background:#0f1f3d;border-radius:10px;padding:10px 13px;border:1px solid #1e3a5f;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.pig-entry-info{flex:1;min-width:0}
+.pig-entry-amt{font-weight:700;font-size:15px;color:#f0c040}
+.pig-entry-desc{font-size:12px;color:#94a3b8;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pig-entry-date{font-size:11px;color:#475569;margin-top:2px}
+.pig-actions{display:flex;gap:6px;flex-shrink:0}
+.pig-out-btn{background:#7c3aed22;border:1px solid #7c3aed;border-radius:6px;color:#c4b5fd;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
+.pig-edit-btn{background:#1e3a5f;border:1px solid #2563eb;border-radius:6px;color:#7dd3fc;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
+.pig-del-btn{background:#300;border:1px solid #7f1d1d;border-radius:6px;color:#fca5a5;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
+/* ── DATA PAGE ── */
+.data-card{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:12px;padding:16px;margin-bottom:12px}
+.data-card-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.data-card-desc{font-size:12px;color:#64748b;margin-bottom:12px;line-height:1.6}
+.data-btn{width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;margin-bottom:8px}
+.data-btn:last-child{margin-bottom:0}
+.data-btn.import{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff}
+.data-btn.export{background:linear-gradient(135deg,#065f46,#047857);color:#fff}
+.data-btn.reset{background:#1e293b;color:#ef4444;border:1px solid #7f1d1d}
+.data-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.stat-box{background:#0a1628;border-radius:8px;padding:10px;text-align:center;border:1px solid #1e293b}
+.stat-num{font-size:20px;font-weight:800;color:#7dd3fc}
+.stat-lbl{font-size:11px;color:#475569;margin-top:2px}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 24px}
+.empty-state .big{font-size:48px;margin-bottom:12px}
+.empty-state .ttl{font-size:18px;font-weight:700;margin-bottom:8px}
+.empty-state .sub{font-size:13px;color:#64748b;line-height:1.7;margin-bottom:24px}
+.empty-import-btn{background:linear-gradient(135deg,#1e40af,#1d4ed8);border:none;border-radius:12px;color:#fff;padding:14px 32px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700}
+/* ── BOTTOM SHEET ── */
+.sheet-wrap{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.sheet-box{position:relative;background:#1e293b;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 16px 36px;z-index:1}
+.sheet-title{font-size:13px;color:#94a3b8;text-align:center;margin-bottom:4px}
+.sheet-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:14px}
+.sopt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;margin-bottom:6px;border:2px solid transparent}
+.sopt:active,.sopt.sel{border-color:#3b82f6;background:#0f1f3d}
+.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sopt-label{font-weight:600;font-size:14px}
+.sopt-desc{font-size:12px;color:#64748b;margin-top:1px}
+.sdiv{height:1px;background:#334155;margin:10px 0}
+.icon-actions{display:flex;gap:8px}
+.ia-btn{flex:1;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600}
+.ia-upload{background:#1e40af;color:#fff}
+.ia-reset{background:#374151;color:#9ca3af}
+/* ── EDIT SHEET ── */
+.edit-input{width:100%;background:#0a1628;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
+.edit-row{display:flex;gap:8px}
+.edit-save{flex:1;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:8px;color:#fff;padding:10px;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px}
+.edit-cancel{background:#374151;border:none;border-radius:8px;color:#9ca3af;padding:10px 16px;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px}
+/* ── MISC ── */
+input[type=file]{display:none}
+.empty{text-align:center;padding:24px 0;color:#475569;font-size:13px;line-height:2}
+svg text{font-family:'PingFang SC',sans-serif}
+.tip{font-size:11px;color:#475569;text-align:center;margin-top:12px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">💳 卡片管家</div>
+      <div class="hdr-sub" id="hdr-sub">请先导入数据</div>
+    </div>
+    <div class="hdr-right">
+      <button class="icon-btn" title="导出数据" onclick="exportData()">⬆️</button>
+      <button class="icon-btn" title="导入数据" onclick="document.getElementById('import-file').click()">⬇️</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="ST('cards')">卡片</button>
+    <button class="tab" onclick="ST('cal')">日历</button>
+    <button class="tab" onclick="ST('piggy')">储蓄罐</button>
+    <button class="tab" onclick="ST('data')">数据</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- CARDS -->
+  <div id="p-cards">
+    <div id="cards-inner"></div>
+    <div class="tip" id="cards-tip" style="display:none">点图标可上传Logo · 点状态标签可修改</div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="p-cal" style="display:none">
+    <div class="cal-nav">
+      <button class="cal-arrow" onclick="calNav(-1)">‹</button>
+      <div class="cal-month" id="cal-title"></div>
+      <button class="cal-arrow" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#f0c040"></div>转账</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#7dd3fc"></div>投资</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div>赎回</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#34d399"></div>消费</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#fb923c"></div>季度</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div id="cal-tasks"></div>
+  </div>
+
+  <!-- PIGGY -->
+  <div id="p-piggy" style="display:none">
+    <div class="pig-hero">
+      <div style="font-size:38px;margin-bottom:4px">🐷</div>
+      <div style="font-size:12px;color:#c4b5fd;margin-bottom:4px">储蓄罐余额</div>
+      <div class="pig-total" id="pig-total">¥0</div>
+    </div>
+    <input class="pig-input" type="number" id="pig-amt" placeholder="金额（元）">
+    <input class="pig-desc" id="pig-desc" placeholder="备注（可选，如：想买的东西）" style="display:block;width:100%">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="pig-btn" style="flex:1" onclick="pigAdd()">＋ 存入</button>
+      <button class="pig-btn" style="flex:1;background:linear-gradient(135deg,#7f1d1d,#991b1b)" onclick="pigOut()">－ 转出</button>
+    </div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:8px" id="pig-log-lbl">存款记录</div>
+    <div id="pig-log"></div>
+  </div>
+
+  <!-- DATA -->
+  <div id="p-data" style="display:none">
+    <div class="data-card">
+      <div class="data-card-title">📊 数据概览</div>
+      <div class="data-stats" id="data-stats">
+        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">卡片总数</div></div>
+        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">任务总数</div></div>
+        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">活跃账户</div></div>
+        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">储蓄罐余额</div></div>
+      </div>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">⬇️ 导入数据</div>
+      <div class="data-card-desc">从 JSON 文件导入卡片和任务数据。导入不会覆盖你的打卡记录和自定义图标，只更新卡片列表和任务配置。</div>
+      <button class="data-btn import" onclick="document.getElementById('import-file').click()">选择 JSON 文件导入</button>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">⬆️ 导出数据</div>
+      <div class="data-card-desc">将当前所有数据（包括卡片、任务、打卡记录、储蓄罐）导出为 JSON 文件，用于备份或迁移。</div>
+      <button class="data-btn export" onclick="exportData()">导出全部数据</button>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-title">🗑️ 重置数据</div>
+      <div class="data-card-desc">清空所有数据，恢复空白状态。此操作不可撤销，请提前导出备份。</div>
+      <button class="data-btn reset" onclick="resetAll()">清空所有数据</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Empty state (shown when no data) -->
+<div id="empty-state" class="empty-state" style="display:none">
+  <div class="big">💳</div>
+  <div class="ttl">还没有数据</div>
+  <div class="sub">导入你的 JSON 数据文件<br>即可开始管理所有银行卡</div>
+  <button class="empty-import-btn" onclick="document.getElementById('import-file').click()">⬇️ 导入数据文件</button>
+</div>
+
+<!-- Card sheet -->
+<div class="sheet-wrap" id="card-sheet" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('card-sheet')"></div>
+  <div class="sheet-box">
+    <div class="sheet-title">修改卡片</div>
+    <div class="sheet-name" id="cs-name"></div>
+    <div class="sopt" id="sopt-active" onclick="setStatus('active')">
+      <div class="sdot" style="background:#4ade80"></div>
+      <div><div class="sopt-label" style="color:#4ade80">正常使用</div><div class="sopt-desc">活跃，参与保活计划</div></div>
+    </div>
+    <div class="sopt" id="sopt-pending" onclick="setStatus('pending')">
+      <div class="sdot" style="background:#7dd3fc"></div>
+      <div><div class="sopt-label" style="color:#7dd3fc">待开通</div><div class="sopt-desc">尚未开户，计划中</div></div>
+    </div>
+    <div class="sopt" id="sopt-frozen" onclick="setStatus('frozen')">
+      <div class="sdot" style="background:#9ca3af"></div>
+      <div><div class="sopt-label" style="color:#9ca3af">冻结 / 停用</div><div class="sopt-desc">暂不可用</div></div>
+    </div>
+    <div class="sdiv"></div>
+    <div class="icon-actions">
+      <button class="ia-btn ia-upload" onclick="triggerUpload()">📷 上传银行Logo</button>
+      <button class="ia-btn ia-reset" onclick="resetIcon()">✕ 恢复默认</button>
+    </div>
+  </div>
+</div>
+
+<!-- Piggy edit sheet -->
+<div class="sheet-wrap" id="pig-sheet" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('pig-sheet')"></div>
+  <div class="sheet-box">
+    <div class="sheet-title">编辑记录</div>
+    <input class="edit-input" id="edit-amt" type="number" placeholder="金额">
+    <input class="edit-input" id="edit-desc" placeholder="备注">
+    <div class="edit-row">
+      <button class="edit-cancel" onclick="closeSheet('pig-sheet')">取消</button>
+      <button class="edit-save" onclick="pigSaveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="import-file" accept=".json" onchange="importData(event)">
+<input type="file" id="icon-upload" accept="image/*" onchange="handleIconUpload(event)">
+
+<script>
+// ──────────────────────────────────────────────
+//  State
+// ──────────────────────────────────────────────
+let D = null;           // imported data
+let curTab = 'cards';
+let calYear, calMonth;  // 1-12
+let selDay = null;
+let curCardId = null;
+let editPigId = null;
+// userState stored in localStorage
+let US = { cl:{}, qcl:{}, cc:{}, pig:[] };
+
+const NC={"银联":"#e60012","万事达":"#eb001b","Visa美元":"#1a1f71","Visa":"#1a1f71","运通":"#007bc0","账户":"#64748b"};
+const NB={"银联":"#fff0f0","万事达":"#fff0f0","Visa美元":"#eef0ff","Visa":"#eef0ff","运通":"#e8f4fc","账户":"#f1f5f9"};
+const TC_COLOR={transfer:"#f0c040",invest:"#7dd3fc",redeem:"#a78bfa",consume:"#34d399",quarterly:"#fb923c"};
+const TC_ICON={transfer:"💸",invest:"📈",redeem:"♻️",consume:"🛒",quarterly:"🔄"};
+const TC_LABEL={transfer:"转账操作",invest:"循环申购",redeem:"月底赎回",consume:"消费记录",quarterly:"季度操作"};
+const DOW=["日","一","二","三","四","五","六"];
+
+// ──────────────────────────────────────────────
+//  Persistence helpers
+// ──────────────────────────────────────────────
+function sv(k,v){try{localStorage.setItem(k,typeof v==="string"?v:JSON.stringify(v));}catch(e){}}
+function ld(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function saveUS(){sv("us",US);}
+function loadUS(){const s=ld("us");if(s)US=JSON.parse(s);}
+function saveD(){if(D)sv("appdata",D);}
+function loadD(){const s=ld("appdata");if(s){D=JSON.parse(s);return true;}return false;}
+
+// ──────────────────────────────────────────────
+//  Boot
+// ──────────────────────────────────────────────
+function init(){
+  loadUS();
+  const now=new Date();
+  calYear=now.getFullYear();calMonth=now.getMonth()+1;
+  if(loadD()){
+    boot();
+  } else {
+    showEmpty();
+  }
+}
+
+function boot(){
+  hideEmpty();
+  updateHeader();
+  renderCards();
+  renderCal();
+  renderPiggy();
+  renderDataPage();
+}
+
+function showEmpty(){
+  document.getElementById("empty-state").style.display="block";
+  document.getElementById("p-cards").style.display="none";
+  document.getElementById("cards-tip").style.display="none";
+}
+function hideEmpty(){
+  document.getElementById("empty-state").style.display="none";
+  document.getElementById("p-cards").style.display="block";
+  document.getElementById("cards-tip").style.display="block";
+}
+
+function updateHeader(){
+  if(!D)return;
+  const now=new Date();
+  const all=allCards();
+  const active=all.filter(c=>gst(c.id)==="active").length;
+  document.getElementById("hdr-sub").textContent=`${now.getFullYear()}年${now.getMonth()+1}月 · ${active} 张活跃`;
+}
+
+// ──────────────────────────────────────────────
+//  Import / Export
+// ──────────────────────────────────────────────
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const json=JSON.parse(ev.target.result);
+      // Accept both full export and data-only file
+      if(json.data){
+        // full export
+        D=json.data;
+        if(json.userState) US=json.userState;
+      } else {
+        // data-only file
+        D=json;
+      }
+      saveD();saveUS();
+      boot();
+      alert("✅ 导入成功！");
+    }catch(err){
+      alert("❌ 导入失败：文件格式不正确\n"+err.message);
+    }
+  };
+  r.readAsText(f);
+  e.target.value="";
+}
+
+function exportData(){
+  if(!D){alert("请先导入数据");return;}
+  const payload={
+    exportTime:new Date().toISOString(),
+    data:D,
+    userState:US
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  const now=new Date();
+  a.href=url;
+  a.download=`卡片管家备份_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+  if(!confirm("确定要清空所有数据吗？此操作不可撤销！")) return;
+  D=null; US={cl:{},qcl:{},cc:{},pig:[]};
+  try{localStorage.clear();}catch(e){}
+  showEmpty();
+}
+
+// ──────────────────────────────────────────────
+//  Cards
+// ──────────────────────────────────────────────
+function allCards(){
+  if(!D)return[];
+  return [...(D.cards.mainland||[]),...(D.cards.hk||[])];
+}
+function gst(id){return(US.cc[id]&&US.cc[id].status)||allCards().find(c=>c.id===id)?.status||"active";}
+function gic(id){return US.cc[id]&&US.cc[id].icon||null;}
+
+function renderCards(){
+  if(!D){document.getElementById("cards-inner").innerHTML="";return;}
+  const ml=D.cards.mainland||[], hk=D.cards.hk||[];
+  let h="";
+  if(ml.length){
+    h+=`<div class="sec-hdr"><span>🏦</span><span class="sec-title">内地借记卡</span><span class="cnt">${ml.length}</span></div>`;
+    h+=ml.map(cardH).join("");
+  }
+  if(hk.length){
+    h+=`<div class="sec-hdr" style="margin-top:18px"><span>🇭🇰</span><span class="sec-title">港区账户</span><span class="cnt">${hk.length}</span></div>`;
+    h+=hk.map(cardH).join("");
+  }
+  document.getElementById("cards-inner").innerHTML=h;
+}
+
+function cardH(c){
+  const st=gst(c.id), ic=gic(c.id);
+  const sl={active:"s-active",frozen:"s-frozen",pending:"s-pending"};
+  const sl2={active:"正常",frozen:"冻结",pending:"待开"};
+  return `<div class="ci s-${st}">
+    <div class="ci-icon" onclick="openCardSheet('${c.id}')">
+      <div class="ci-icon-inner" style="background:${ic?"#1e293b":c.color+"22"};border:1px solid ${ic?"#334155":c.color+"44"}">
+        ${ic?`<img src="${ic}">`:`<div class="ci-dot" style="background:${c.color};opacity:${st==="pending"?.35:.9}"></div>`}
+      </div>
+      <div class="ci-overlay">📷</div>
+    </div>
+    <div class="ci-info">
+      <div class="ci-name-row">
+        <span class="ci-name">${c.bank}</span>
+        ${c.tail?`<span class="ci-tail">*${c.tail}</span>`:""}
+        <button class="sbtn ${sl[st]}" onclick="openCardSheet('${c.id}')">${sl2[st]}</button>
+      </div>
+      <div class="ci-meta">
+        <span class="nbadge" style="background:${NB[c.network]||"#1e293b"};color:${NC[c.network]||"#94a3b8"}">${c.network}</span>
+        <span class="ci-role">${c.role}</span>
+      </div>
+      ${c.note?`<div class="ci-note">${c.note}</div>`:""}
+    </div>
+  </div>`;
+}
+
+function openCardSheet(id){
+  curCardId=id;
+  const c=allCards().find(x=>x.id===id);
+  const st=gst(id);
+  document.getElementById("cs-name").textContent=c.bank+(c.tail?" *"+c.tail:"");
+  ["active","pending","frozen"].forEach(s=>document.getElementById("sopt-"+s).classList.toggle("sel",s===st));
+  document.getElementById("card-sheet").style.display="flex";
+}
+function setStatus(st){
+  if(!curCardId)return;
+  if(!US.cc[curCardId])US.cc[curCardId]={};
+  US.cc[curCardId].status=st;
+  saveUS();closeSheet("card-sheet");renderCards();updateHeader();
+}
+function triggerUpload(){document.getElementById("icon-upload").value="";document.getElementById("icon-upload").click();}
+function handleIconUpload(e){
+  const f=e.target.files[0];if(!f||!curCardId)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    if(!US.cc[curCardId])US.cc[curCardId]={};
+    US.cc[curCardId].icon=ev.target.result;
+    saveUS();closeSheet("card-sheet");renderCards();
+  };r.readAsDataURL(f);
+}
+function resetIcon(){
+  if(!curCardId)return;
+  if(US.cc[curCardId])delete US.cc[curCardId].icon;
+  saveUS();closeSheet("card-sheet");renderCards();
+}
+
+// ──────────────────────────────────────────────
+//  Calendar
+// ──────────────────────────────────────────────
+function calNav(dir){
+  calMonth+=dir;
+  if(calMonth>12){calMonth=1;calYear++;}
+  if(calMonth<1){calMonth=12;calYear--;}
+  selDay=null;
+  renderCal();
+}
+
+function getTasksForDay(y,m,d){
+  if(!D)return[];
+  const tasks=[];
+  // Monthly tasks
+  (D.monthlyTasks||[]).forEach(t=>{
+    if(t.day===d) tasks.push({...t,_type:"monthly",_y:y,_m:m,_d:d});
+  });
+  // Quarterly tasks
+  (D.quarterlyTasks||[]).forEach(t=>{
+    if((t.months||[]).includes(m)&&t.day===d) tasks.push({...t,_type:"quarterly",_y:y,_m:m,_d:d});
+  });
+  return tasks;
+}
+
+function ckeyM(y,m,id){return`m-${y}-${m}-${id}`;}
+function ckeyQ(y,m,id){return`q-${y}-${m}-${id}`;}
+function isChecked(task){
+  if(task._type==="monthly") return !!US.cl[ckeyM(task._y,task._m,task.id)];
+  return !!US.cl[ckeyQ(task._y,task._m,task.id)];
+}
+function toggleTask(task){
+  const k=task._type==="monthly"?ckeyM(task._y,task._m,task.id):ckeyQ(task._y,task._m,task.id);
+  US.cl[k]=!US.cl[k];
+  saveUS();renderCal();
+}
+
+function renderCal(){
+  if(!D){document.getElementById("cal-grid").innerHTML="";document.getElementById("cal-tasks").innerHTML="";return;}
+  const now=new Date();
+  const today={y:now.getFullYear(),m:now.getMonth()+1,d:now.getDate()};
+  document.getElementById("cal-title").textContent=`${calYear}年${calMonth}月`;
+
+  // Build grid
+  const firstDay=new Date(calYear,calMonth-1,1).getDay(); // 0=Sun
+  const daysInMonth=new Date(calYear,calMonth,0).getDate();
+  const prevDays=new Date(calYear,calMonth-1,0).getDate();
+
+  let h=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join("");
+
+  let cells=[];
+  // Prev month padding
+  for(let i=firstDay-1;i>=0;i--) cells.push({d:prevDays-i,other:true});
+  // This month
+  for(let d=1;d<=daysInMonth;d++){
+    const tasks=getTasksForDay(calYear,calMonth,d);
+    cells.push({d,tasks,isToday:today.y===calYear&&today.m===calMonth&&today.d===d});
+  }
+  // Next month padding
+  const rem=(7-cells.length%7)%7;
+  for(let i=1;i<=rem;i++) cells.push({d:i,other:true});
+
+  cells.forEach(cell=>{
+    if(cell.other){
+      h+=`<div class="cal-day other-month"><div class="cal-dn">${cell.d}</div></div>`;
+      return;
+    }
+    const tasks=cell.tasks||[];
+    const hasTasks=tasks.length>0;
+    const isSel=selDay===cell.d;
+    const dots=tasks.map(t=>`<div class="cal-dot" style="background:${TC_COLOR[t.type]||TC_COLOR.transfer}"></div>`).join("");
+    h+=`<div class="cal-day ${cell.isToday?"today":""} ${hasTasks?"has-tasks":""} ${isSel?"" :""}"
+         style="${isSel?"border:1.5px solid #3b82f6;border-radius:8px":""}"
+         onclick="selDate(${cell.d})">
+      <div class="cal-dn">${cell.d}</div>
+      ${hasTasks?`<div class="cal-dots">${dots}</div>`:""}
+    </div>`;
+  });
+
+  document.getElementById("cal-grid").innerHTML=h;
+  renderCalTasks();
+}
+
+function selDate(d){
+  selDay=(selDay===d)?null:d;
+  renderCal();
+}
+
+function renderCalTasks(){
+  const el=document.getElementById("cal-tasks");
+  if(!selDay){el.innerHTML="";return;}
+  const tasks=getTasksForDay(calYear,calMonth,selDay);
+  if(!tasks.length){
+    el.innerHTML=`<div class="cal-task-date">${calMonth}月${selDay}日</div><div class="empty">今天没有任务 🎉</div>`;
+    return;
+  }
+  let h=`<div class="cal-task-date">${calMonth}月${selDay}日 · ${tasks.length}个任务</div>`;
+  tasks.forEach(t=>{
+    const done=isChecked(t);
+    const ck=t._type==="quarterly"?"ckq":"ck";
+    const doneClass=t._type==="quarterly"?"doneq":"done";
+    h+=`<div class="task-item ${done?"done":""}" onclick="toggleTask(${JSON.stringify(t).replace(/"/g,"'")})">
+      <div class="tcheck ${done?ck:""}">${done?"✓":""}</div>
+      <div class="tbody">
+        <div class="ttop">
+          <span class="tlabel ${done?doneClass:""}">${t.label}</span>
+          ${t.amount?`<span class="tamt" style="color:${TC_COLOR[t.type]};background:${TC_COLOR[t.type]}15">${t.amount}</span>`:""}
+        </div>
+        <div class="tsub">${TC_ICON[t.type]||"📌"} ${TC_LABEL[t.type]||""}</div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+// ──────────────────────────────────────────────
+//  Piggy Bank
+// ──────────────────────────────────────────────
+function pigTotal(){return US.pig.reduce((s,e)=>s+e.amount,0);}
+
+function pigAdd(){
+  const amt=parseFloat(document.getElementById("pig-amt").value);
+  if(!amt||amt===0)return;
+  const desc=document.getElementById("pig-desc").value.trim();
+  const now=new Date();
+  const entry={id:Date.now(),amount:amt,desc:desc||"",date:now.toLocaleDateString("zh-CN"),ts:now.toISOString()};
+  US.pig=[entry,...US.pig];
+  document.getElementById("pig-amt").value="";
+  document.getElementById("pig-desc").value="";
+  saveUS();renderPiggy();
+}
+
+function pigOut(){
+  const amt=parseFloat(document.getElementById("pig-amt").value);
+  if(!amt||amt<=0){alert("请输入转出金额");return;}
+  const total=pigTotal();
+  if(amt>total){alert(`余额不足，当前余额 ¥${total}`);return;}
+  const desc=document.getElementById("pig-desc").value.trim()||"转出";
+  const now=new Date();
+  const entry={id:Date.now(),amount:-amt,desc:desc,date:now.toLocaleDateString("zh-CN"),ts:now.toISOString()};
+  US.pig=[entry,...US.pig];
+  document.getElementById("pig-amt").value="";
+  document.getElementById("pig-desc").value="";
+  saveUS();renderPiggy();
+}
+
+function pigDelete(id){
+  if(!confirm("确定删除这条记录？")) return;
+  US.pig=US.pig.filter(e=>e.id!==id);
+  saveUS();renderPiggy();
+}
+
+function pigEdit(id){
+  editPigId=id;
+  const e=US.pig.find(x=>x.id===id);
+  document.getElementById("edit-amt").value=Math.abs(e.amount);
+  document.getElementById("edit-desc").value=e.desc||"";
+  document.getElementById("pig-sheet").style.display="flex";
+}
+
+function pigSaveEdit(){
+  const amt=parseFloat(document.getElementById("edit-amt").value);
+  if(!amt)return;
+  const desc=document.getElementById("edit-desc").value.trim();
+  const idx=US.pig.findIndex(e=>e.id===editPigId);
+  if(idx>=0){
+    const orig=US.pig[idx];
+    US.pig[idx]={...orig,amount:orig.amount<0?-amt:amt,desc};
+  }
+  saveUS();closeSheet("pig-sheet");renderPiggy();
+}
+
+function renderPiggy(){
+  const total=pigTotal();
+  document.getElementById("pig-total").textContent="¥"+total.toLocaleString();
+  if(!US.pig.length){
+    document.getElementById("pig-log-lbl").style.display="none";
+    document.getElementById("pig-log").innerHTML=`<div class="empty">还没有记录</div>`;
+    return;
+  }
+  document.getElementById("pig-log-lbl").style.display="block";
+  document.getElementById("pig-log").innerHTML=US.pig.map(e=>{
+    const isOut=e.amount<0;
+    return `<div class="pig-entry">
+      <div class="pig-entry-info">
+        <div class="pig-entry-amt" style="color:${isOut?"#f87171":"#f0c040"}">${isOut?"－":"＋"}¥${Math.abs(e.amount).toLocaleString()}</div>
+        ${e.desc?`<div class="pig-entry-desc">${e.desc}</div>`:""}
+        <div class="pig-entry-date">${e.date}</div>
+      </div>
+      <div class="pig-actions">
+        <button class="pig-edit-btn" onclick="pigEdit(${e.id})">编辑</button>
+        <button class="pig-del-btn" onclick="pigDelete(${e.id})">删除</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ──────────────────────────────────────────────
+//  Data page
+// ──────────────────────────────────────────────
+function renderDataPage(){
+  if(!D)return;
+  const all=allCards();
+  const mt=(D.monthlyTasks||[]).length+(D.quarterlyTasks||[]).length;
+  const active=all.filter(c=>gst(c.id)==="active").length;
+  const pigBal=pigTotal();
+  document.getElementById("data-stats").innerHTML=`
+    <div class="stat-box"><div class="stat-num">${all.length}</div><div class="stat-lbl">卡片总数</div></div>
+    <div class="stat-box"><div class="stat-num">${mt}</div><div class="stat-lbl">任务总数</div></div>
+    <div class="stat-box"><div class="stat-num">${active}</div><div class="stat-lbl">活跃账户</div></div>
+    <div class="stat-box"><div class="stat-num" style="font-size:16px">¥${pigBal}</div><div class="stat-lbl">储蓄罐余额</div></div>
+  `;
+}
+
+// ──────────────────────────────────────────────
+//  Tabs / Utils
+// ──────────────────────────────────────────────
+function ST(tab){
+  curTab=tab;
+  ["cards","cal","piggy","data"].forEach(t=>{
+    document.getElementById("p-"+t).style.display=t===tab?"block":"none";
+  });
+  document.querySelectorAll(".tab").forEach((el,i)=>{
+    el.className="tab"+(["cards","cal","piggy","data"][i]===tab?" on":"");
+  });
+  if(tab==="data")renderDataPage();
+}
+
+function closeSheet(id){document.getElementById(id).style.display="none";}
+
+// ──────────────────────────────────────────────
+//  PWA
+// ──────────────────────────────────────────────
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    const sw=`const C='cm-v3';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))))`;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(()=>{});
+  });
+}
+let dp;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();dp=e;
+  const b=document.createElement("div");
+  b.innerHTML=`<div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1e40af;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;cursor:pointer;box-shadow:0 4px 20px #0008;z-index:999;white-space:nowrap" onclick="ia()">📲 安装到桌面</div>`;
+  document.body.appendChild(b);setTimeout(()=>b.remove(),8000);
+});
+function ia(){if(dp){dp.prompt();dp=null;}}
+
+init();
+</script>
+</body>
+</html>
