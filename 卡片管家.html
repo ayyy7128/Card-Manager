@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>💳 卡片管家</title>
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,141 +13,217 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:#0a0f1e;color:#e2e8f0;font-family:'PingFang SC','Noto Sans SC','Helvetica Neue',sans-serif;min-height:100vh}
-/* ── HEADER ── */
-.hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:18px 16px 0;border-bottom:1px solid #1e3a5f}
-.hdr-top{display:flex;justify-content:space-between;align-items:center;max-width:480px;margin:0 auto 12px}
-.hdr-title{font-size:20px;font-weight:700}
+.hdr{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:14px 14px 0;border-bottom:1px solid #1e3a5f;position:sticky;top:0;z-index:50}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;max-width:520px;margin:0 auto 10px}
+.hdr-title{font-size:19px;font-weight:700}
 .hdr-sub{font-size:11px;color:#7dd3fc;margin-top:2px}
-.hdr-right{display:flex;gap:8px;align-items:center}
-.icon-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;padding:4px;border-radius:6px}
-.icon-btn:active{background:#1e3a5f}
-.tabs{display:flex;max-width:480px;margin:0 auto}
-.tab{flex:1;padding:8px 2px;border:none;border-radius:8px 8px 0 0;cursor:pointer;font-size:12px;font-family:inherit;transition:all .2s;background:transparent;color:#94a3b8}
+.hdr-btns{display:flex;gap:5px}
+.hbtn{background:#1e3a5f;border:1px solid #2563eb44;border-radius:8px;color:#7dd3fc;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;padding:5px 10px;white-space:nowrap}
+.hbtn:active{background:#1e40af}
+.tabs{display:flex;max-width:520px;margin:0 auto}
+.tab{flex:1;padding:8px 2px;border:none;border-radius:8px 8px 0 0;cursor:pointer;font-size:12px;font-family:inherit;background:transparent;color:#94a3b8;transition:all .2s}
 .tab.on{background:#1e40af;color:#fff;font-weight:700}
-/* ── CONTENT ── */
-.content{max-width:480px;margin:0 auto;padding:16px 16px 80px}
-/* ── SECTION ── */
-.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:16px}
-.sec-hdr:first-child{margin-top:0}
-.sec-title{font-weight:700;font-size:15px}
-.cnt{font-size:11px;color:#475569;background:#1e293b;border-radius:20px;padding:1px 8px}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 90px}
+
+/* ── GROUP ── */
+.grp-hdr{display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:7px 10px;background:#0f1f3d;border-radius:10px 10px 0 0;border:1px solid #1e3a5f;cursor:pointer;user-select:none}
+.grp-hdr.collapsed{border-radius:10px;margin-bottom:8px}
+.grp-icon{font-size:14px;flex-shrink:0}
+.grp-name{font-weight:700;font-size:13px;flex:1}
+.grp-cnt{font-size:11px;color:#475569;background:#0a1628;border-radius:10px;padding:1px 7px}
+.grp-chevron{font-size:12px;color:#475569;transition:transform .2s;flex-shrink:0}
+.grp-chevron.open{transform:rotate(90deg)}
+.grp-actions{display:flex;gap:2px}
+.grp-edit-btn{background:none;border:none;color:#334155;cursor:pointer;font-size:13px;padding:3px 5px;border-radius:5px}
+.grp-edit-btn:active{color:#7dd3fc;background:#1e3a5f}
+.grp-body{border:1px solid #1e3a5f;border-top:none;border-radius:0 0 10px 10px;padding:6px 6px 4px;margin-bottom:8px;background:#080f1e}
+.grp-body.hidden{display:none}
+.grp-add-btn{width:100%;padding:7px;border:1.5px dashed #1e293b;border-radius:7px;background:transparent;color:#334155;cursor:pointer;font-size:11px;text-align:center;margin-top:2px;transition:all .2s}
+.grp-add-btn:active{border-color:#3b82f6;color:#7dd3fc}
+.add-grp-btn{width:100%;padding:9px;border:1.5px dashed #1e3a5f;border-radius:10px;background:transparent;color:#475569;cursor:pointer;font-size:12px;margin-top:6px;transition:all .2s}
+.add-grp-btn:active{border-color:#3b82f6;color:#7dd3fc}
+
 /* ── CARD ITEM ── */
-.ci{border-radius:12px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px}
+.ci{border-radius:8px;padding:9px 10px;margin-bottom:5px;display:flex;align-items:center;gap:9px;position:relative}
 .ci.s-active{background:linear-gradient(135deg,#0f1f3d,#0a1628);border:1px solid #1e3a5f}
 .ci.s-frozen{opacity:.5;border:1px solid #374151;background:#0c1828}
 .ci.s-pending{border:1px solid #1e293b;background:#0c1828}
-.ci-icon{position:relative;flex-shrink:0;width:40px;height:40px;cursor:pointer}
-.ci-icon-inner{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.ci-icon-inner img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
-.ci-dot{width:20px;height:14px;border-radius:3px}
-.ci-overlay{position:absolute;inset:0;border-radius:10px;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;font-size:15px}
-.ci-icon:active .ci-overlay{display:flex}
-.ci-info{flex:1;min-width:0}
-.ci-name-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.ci-name{font-weight:700;font-size:14px}
+.ci.dragging{opacity:.4;border-style:dashed}
+.ci.drag-over{border-color:#3b82f6;background:#0f1f3d}
+/* drag handle */
+.drag-handle{color:#1e3a5f;font-size:16px;cursor:grab;flex-shrink:0;padding:2px 2px;touch-action:none;user-select:none;line-height:1}
+.drag-handle:active{color:#475569;cursor:grabbing}
+/* icon */
+.ci-icon{position:relative;flex-shrink:0;width:36px;height:36px;cursor:pointer}
+.ci-img{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ci-img img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
+.ci-dot{width:16px;height:12px;border-radius:3px}
+.ci-ov{position:absolute;inset:0;border-radius:8px;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;font-size:13px}
+.ci-icon:active .ci-ov{display:flex}
+/* body */
+.ci-body{flex:1;min-width:0}
+.ci-top{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ci-bank{font-weight:700;font-size:13px}
 .ci-tail{font-size:11px;color:#64748b}
-.ci-meta{display:flex;gap:5px;margin-top:4px;align-items:center}
-.nbadge{font-size:11px;border-radius:4px;padding:1px 6px;font-weight:600}
-.ci-role{font-size:12px;color:#94a3b8}
-.ci-note{font-size:11px;color:#64748b;margin-top:2px}
-.sbtn{font-size:10px;border-radius:5px;padding:2px 7px;border:none;cursor:pointer;font-family:inherit;font-weight:600}
-.sbtn.s-active{background:#14532d;color:#4ade80;border:1px solid #166534}
-.sbtn.s-frozen{background:#374151;color:#9ca3af;border:1px solid #4b5563}
-.sbtn.s-pending{background:#1e3a5f;color:#7dd3fc;border:1px solid #1e4a7f}
-/* ── CALENDAR ── */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.cal-month{font-size:17px;font-weight:700}
-.cal-arrow{background:none;border:none;color:#7dd3fc;font-size:20px;cursor:pointer;padding:4px 10px;border-radius:8px}
-.cal-arrow:active{background:#1e293b}
+.stbtn{font-size:10px;border-radius:4px;padding:1px 5px;border:none;cursor:pointer;font-family:inherit;font-weight:600}
+.stbtn.s-active{background:#14532d;color:#4ade80;border:1px solid #166534}
+.stbtn.s-frozen{background:#374151;color:#9ca3af;border:1px solid #4b5563}
+.stbtn.s-pending{background:#1e3a5f;color:#7dd3fc;border:1px solid #1e4a7f}
+.ci-meta{display:flex;gap:4px;margin-top:3px;align-items:center;flex-wrap:wrap}
+.nbadge{font-size:10px;border-radius:3px;padding:1px 5px;font-weight:700}
+.ci-role{font-size:11px;color:#94a3b8}
+.ci-note{font-size:10px;color:#64748b;margin-top:2px}
+/* subtle edit icon at right */
+.ci-edit{background:none;border:none;color:#1e3a5f;cursor:pointer;font-size:14px;padding:4px 2px;border-radius:5px;flex-shrink:0;transition:color .15s}
+.ci:hover .ci-edit,.ci-edit:active{color:#475569}
+
+/* ── CAL ── */
+.cal-subtabs{display:flex;gap:6px;margin-bottom:14px}
+.cstab{flex:1;padding:8px;border-radius:9px;border:1.5px solid #1e3a5f;background:transparent;color:#94a3b8;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .2s}
+.cstab.on{background:#1e40af;color:#fff;border-color:#1e40af}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-lbl{font-size:17px;font-weight:700}
+.carr{background:none;border:none;color:#7dd3fc;font-size:22px;cursor:pointer;padding:3px 10px;border-radius:7px}
+.carr:active{background:#1e293b}
+.cal-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b}
+.ldot{width:7px;height:7px;border-radius:50%}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-dow{text-align:center;font-size:11px;color:#475569;padding:6px 0;font-weight:600}
-.cal-day{min-height:48px;border-radius:8px;padding:4px 2px;cursor:pointer;transition:background .15s;display:flex;flex-direction:column;align-items:center}
-.cal-day:active{background:#1e293b}
-.cal-day.today .cal-dn{background:#1e40af;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
-.cal-day.other-month{opacity:.3}
-.cal-day.has-tasks{background:#0f1f3d}
-.cal-dn{font-size:13px;font-weight:600;margin-bottom:3px;min-width:24px;text-align:center;line-height:24px}
-.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:36px}
-.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-/* Task list below calendar */
-.cal-task-date{font-size:13px;color:#94a3b8;margin:16px 0 8px;font-weight:600}
-.task-item{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
-.task-item.done{background:#0a2010;border-color:#166534}
-.tcheck{width:22px;height:22px;border-radius:6px;border:2px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:#fff;transition:all .2s}
-.tcheck.ck{background:#22c55e;border-color:#22c55e}
-.tcheck.ckq{background:#f97316;border-color:#f97316}
-.tbody{flex:1}
-.ttop{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tlabel{font-size:14px;font-weight:600}
-.tlabel.done{text-decoration:line-through;color:#4ade80}
-.tlabel.doneq{text-decoration:line-through;color:#fb923c}
-.tamt{font-size:11px;border-radius:5px;padding:2px 7px;font-weight:700;white-space:nowrap}
-.tsub{font-size:11px;color:#475569;margin-top:2px}
-/* legend */
-.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b}
-.leg-dot{width:8px;height:8px;border-radius:50%}
+.dow{text-align:center;font-size:10px;color:#475569;padding:5px 0;font-weight:600}
+.cday{min-height:50px;border-radius:7px;padding:3px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1.5px solid transparent}
+.cday:active,.cday.sel{border-color:#3b82f6;background:#0f1f3d}
+.cday.today .cdn{background:#1e40af;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.cday.other{opacity:.25;cursor:default}
+.cdn{font-size:12px;font-weight:600;min-width:22px;text-align:center;line-height:22px;margin-bottom:2px}
+.cdots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:34px}
+.cdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.task-date-hdr{font-size:13px;color:#7dd3fc;margin:14px 0 8px;font-weight:600}
+.mbar{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.mbar-lbl{font-size:11px;color:#94a3b8}
+.mbar-val{font-size:14px;font-weight:700;color:#7dd3fc}
+.prog{width:70px;height:5px;background:#1e293b;border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-fill{height:100%;background:linear-gradient(90deg,#1e40af,#7dd3fc);border-radius:3px;transition:width .3s}
+.ti{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.ti.clickable{cursor:pointer;user-select:none}
+.ti.done{background:#0a2010;border-color:#166534}
+.tck{width:21px;height:21px;border-radius:5px;border:2px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:#fff;transition:all .2s}
+.tck.cm{background:#22c55e;border-color:#22c55e}
+.tck.cq{background:#f97316;border-color:#f97316}
+.tck.cw{background:#a78bfa;border-color:#a78bfa}
+.tbody{flex:1;min-width:0}
+.ttop{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.tlbl{font-size:13px;font-weight:600}
+.tlbl.dm{text-decoration:line-through;color:#4ade80}
+.tlbl.dq{text-decoration:line-through;color:#fb923c}
+.tlbl.dw{text-decoration:line-through;color:#a78bfa}
+.tamt{font-size:11px;border-radius:4px;padding:2px 6px;font-weight:700;white-space:nowrap}
+.tsub{font-size:10px;color:#475569;margin-top:2px}
+.t-edit-btn{background:none;border:none;color:#334155;cursor:pointer;font-size:14px;padding:4px;border-radius:5px;flex-shrink:0;transition:color .15s}
+.t-edit-btn:hover,.t-edit-btn:active{color:#7dd3fc}
+
+/* Task overview collapsible sections */
+.tov-sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#0f1f3d;border-radius:9px;cursor:pointer;user-select:none;margin-bottom:6px;border:1px solid #1e3a5f}
+.tov-sec-hdr.open{border-radius:9px 9px 0 0;margin-bottom:0}
+.tov-sec-title{font-size:13px;color:#94a3b8;font-weight:600;display:flex;align-items:center;gap:6px}
+.tov-badge{font-size:10px;background:#0a1628;border-radius:10px;padding:1px 7px;color:#64748b}
+.tov-chevron{font-size:12px;color:#334155;transition:transform .2s}
+.tov-chevron.open{transform:rotate(90deg)}
+.tov-sec-body{border:1px solid #1e3a5f;border-top:none;border-radius:0 0 9px 9px;padding:6px 6px 4px;margin-bottom:10px;background:#080f1e}
+.tov-sec-body.hidden{display:none}
+
 /* ── PIGGY ── */
-.pig-hero{background:linear-gradient(135deg,#3f1f60,#1e293b);border-radius:16px;padding:20px;margin-bottom:14px;text-align:center;border:1px solid #6d28d9}
-.pig-total{font-size:36px;font-weight:800;color:#f0c040;letter-spacing:-1px}
-.pig-input-row{display:flex;gap:8px;margin-bottom:6px}
-.pig-input{flex:1;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:10px 13px;color:#e2e8f0;font-size:15px;outline:none;font-family:inherit}
-.pig-desc{width:100%;background:#0f1f3d;border:1px solid #1e3a5f;border-radius:10px;padding:9px 13px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;margin-bottom:10px}
-.pig-btn{background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:10px;color:#fff;padding:10px 16px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit}
-.pig-entry{background:#0f1f3d;border-radius:10px;padding:10px 13px;border:1px solid #1e3a5f;display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.pig-entry-info{flex:1;min-width:0}
-.pig-entry-amt{font-weight:700;font-size:15px;color:#f0c040}
-.pig-entry-desc{font-size:12px;color:#94a3b8;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pig-entry-date{font-size:11px;color:#475569;margin-top:2px}
-.pig-actions{display:flex;gap:6px;flex-shrink:0}
-.pig-out-btn{background:#7c3aed22;border:1px solid #7c3aed;border-radius:6px;color:#c4b5fd;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
-.pig-edit-btn{background:#1e3a5f;border:1px solid #2563eb;border-radius:6px;color:#7dd3fc;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
-.pig-del-btn{background:#300;border:1px solid #7f1d1d;border-radius:6px;color:#fca5a5;padding:4px 9px;cursor:pointer;font-size:11px;font-family:inherit}
-/* ── DATA PAGE ── */
-.data-card{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:12px;padding:16px;margin-bottom:12px}
-.data-card-title{font-size:14px;font-weight:700;margin-bottom:10px}
-.data-card-desc{font-size:12px;color:#64748b;margin-bottom:12px;line-height:1.6}
-.data-btn{width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;margin-bottom:8px}
-.data-btn:last-child{margin-bottom:0}
-.data-btn.import{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff}
-.data-btn.export{background:linear-gradient(135deg,#065f46,#047857);color:#fff}
-.data-btn.reset{background:#1e293b;color:#ef4444;border:1px solid #7f1d1d}
-.data-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
-.stat-box{background:#0a1628;border-radius:8px;padding:10px;text-align:center;border:1px solid #1e293b}
-.stat-num{font-size:20px;font-weight:800;color:#7dd3fc}
-.stat-lbl{font-size:11px;color:#475569;margin-top:2px}
+.pig-hero{background:linear-gradient(135deg,#3f1f60,#1e293b);border-radius:14px;padding:16px 18px;margin-bottom:12px;border:1px solid #6d28d9}
+.pig-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.pig-hero-lbl{font-size:12px;color:#c4b5fd}
+.pig-card-banner{display:flex;align-items:center;gap:6px;background:#2d1b4e;border-radius:8px;padding:6px 10px;margin-top:8px;border:1px solid #6d28d950}
+.pig-card-name{font-size:12px;color:#c4b5fd;flex:1}
+.pig-card-change{background:none;border:none;color:#7c3aed;font-size:11px;cursor:pointer;font-family:inherit;padding:0}
+.pig-tot{font-size:32px;font-weight:800;color:#f0c040;letter-spacing:-1px;text-align:center}
+.pinput{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:9px;padding:9px 12px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;width:100%;margin-bottom:7px}
+.prow{display:flex;gap:7px;margin-bottom:12px}
+.pbtn{flex:1;padding:10px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px}
+.pbtn-in{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff}
+.pbtn-out{background:linear-gradient(135deg,#7f1d1d,#991b1b);color:#fff}
+.pentry{background:#0f1f3d;border-radius:9px;padding:9px 12px;border:1px solid #1e3a5f;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pentry-info{flex:1;min-width:0}
+.pamt{font-weight:700;font-size:14px}
+.pdesc{font-size:11px;color:#94a3b8;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard-tag{display:inline-block;font-size:10px;color:#7dd3fc;background:#1e3a5f;border-radius:4px;padding:1px 5px;margin-top:2px}
+.pdate{font-size:10px;color:#475569;margin-top:2px}
+.pacts{display:flex;gap:5px;flex-shrink:0}
+.p-ebtn{background:#1e3a5f;border:1px solid #2563eb;border-radius:5px;color:#7dd3fc;padding:3px 8px;cursor:pointer;font-size:11px;font-family:inherit}
+.p-dbtn{background:#300;border:1px solid #7f1d1d;border-radius:5px;color:#fca5a5;padding:3px 8px;cursor:pointer;font-size:11px;font-family:inherit}
+
+/* ── DATA ── */
+.dcard{background:#0f1f3d;border:1px solid #1e3a5f;border-radius:12px;padding:14px;margin-bottom:10px}
+.dcard-title{font-size:14px;font-weight:700;margin-bottom:8px}
+.dcard-desc{font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.6}
+.dbtn{width:100%;padding:11px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-bottom:7px}
+.dbtn:last-child{margin-bottom:0}
+.dbtn.imp{background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff}
+.dbtn.exp{background:linear-gradient(135deg,#065f46,#047857);color:#fff}
+.dbtn.rst{background:#1e293b;color:#ef4444;border:1px solid #7f1d1d}
+.dstats{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sbox{background:#0a1628;border-radius:8px;padding:10px;text-align:center;border:1px solid #1e293b}
+.snum{font-size:20px;font-weight:800;color:#7dd3fc}
+.slbl{font-size:10px;color:#475569;margin-top:2px}
+
 /* ── EMPTY STATE ── */
-.empty-state{text-align:center;padding:48px 24px}
-.empty-state .big{font-size:48px;margin-bottom:12px}
-.empty-state .ttl{font-size:18px;font-weight:700;margin-bottom:8px}
-.empty-state .sub{font-size:13px;color:#64748b;line-height:1.7;margin-bottom:24px}
-.empty-import-btn{background:linear-gradient(135deg,#1e40af,#1d4ed8);border:none;border-radius:12px;color:#fff;padding:14px 32px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:700}
-/* ── BOTTOM SHEET ── */
+.empty-state{text-align:center;padding:56px 24px}
+.empty-state .eb{font-size:52px;margin-bottom:14px}
+.empty-state .et{font-size:18px;font-weight:700;margin-bottom:8px}
+.empty-state .es{font-size:13px;color:#64748b;line-height:1.7;margin-bottom:24px}
+.eibtn{background:linear-gradient(135deg,#1e40af,#1d4ed8);border:none;border-radius:12px;color:#fff;padding:13px 30px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700}
+
+/* ── SHEETS ── */
 .sheet-wrap{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center}
-.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.55)}
-.sheet-box{position:relative;background:#1e293b;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 16px 36px;z-index:1}
-.sheet-title{font-size:13px;color:#94a3b8;text-align:center;margin-bottom:4px}
-.sheet-name{font-size:16px;font-weight:700;text-align:center;margin-bottom:14px}
-.sopt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;margin-bottom:6px;border:2px solid transparent}
-.sopt:active,.sopt.sel{border-color:#3b82f6;background:#0f1f3d}
-.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.sopt-label{font-weight:600;font-size:14px}
-.sopt-desc{font-size:12px;color:#64748b;margin-top:1px}
-.sdiv{height:1px;background:#334155;margin:10px 0}
-.icon-actions{display:flex;gap:8px}
-.ia-btn{flex:1;padding:11px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600}
-.ia-upload{background:#1e40af;color:#fff}
-.ia-reset{background:#374151;color:#9ca3af}
-/* ── EDIT SHEET ── */
-.edit-input{width:100%;background:#0a1628;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
-.edit-row{display:flex;gap:8px}
-.edit-save{flex:1;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:8px;color:#fff;padding:10px;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px}
-.edit-cancel{background:#374151;border:none;border-radius:8px;color:#9ca3af;padding:10px 16px;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px}
-/* ── MISC ── */
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.sheet-box{position:relative;background:#1e293b;border-radius:18px 18px 0 0;width:100%;max-width:520px;padding:18px 16px 40px;z-index:1;max-height:92vh;overflow-y:auto}
+.sh-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sh-title{font-size:15px;font-weight:700}
+.sh-close{background:none;border:none;color:#475569;cursor:pointer;font-size:18px;padding:2px 6px}
+
+/* ── FORM ── */
+.flbl{font-size:11px;color:#64748b;margin-bottom:4px;margin-top:11px;display:block}
+.flbl:first-child{margin-top:0}
+.fi{width:100%;background:#0a1628;border:1px solid #334155;border-radius:8px;padding:9px 11px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit}
+.fi:focus{border-color:#3b82f6}
+.fsel{width:100%;background:#0a1628;border:1px solid #334155;border-radius:8px;padding:9px 11px;color:#e2e8f0;font-size:13px;outline:none;font-family:inherit;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.frow{display:flex;gap:8px;margin-top:14px}
+.f2col{display:flex;gap:8px}
+.f2col>*{flex:1}
+.fbtn-save{flex:1;background:linear-gradient(135deg,#1e40af,#1d4ed8);border:none;border-radius:8px;color:#fff;padding:11px;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px}
+.fbtn-cancel{background:#374151;border:none;border-radius:8px;color:#9ca3af;padding:11px 14px;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px}
+.fbtn-del{background:#300;border:1px solid #7f1d1d;border-radius:8px;color:#fca5a5;padding:11px 14px;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px}
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cswatch{width:28px;height:28px;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.cswatch.sel{border-color:#fff;transform:scale(1.15)}
+.sdiv{height:1px;background:#334155;margin:12px 0}
+.icon-upbtn{width:100%;padding:9px;background:#1e40af22;border:1px solid #1e40af;border-radius:8px;color:#7dd3fc;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;margin-top:8px}
+
+/* virtual card toggle row */
+.nocard-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #1e293b;margin-bottom:2px}
+.nocard-lbl{font-size:12px;color:#94a3b8;flex:1}
+.tgl{width:40px;height:22px;border-radius:11px;background:#334155;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0}
+.tgl.on{background:#1e40af}
+.tgl-knob{width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s}
+.tgl.on .tgl-knob{left:20px}
+
+/* FREQ BOX */
+.freq-box{background:#0a1628;border-radius:8px;padding:12px;margin-top:6px;border:1px solid #334155}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1e293b}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0}
+.toggle-lbl{font-size:12px;color:#94a3b8}
+.toggle-sub{font-size:10px;color:#475569;margin-top:2px}
+.holiday-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1e293b;font-size:12px;color:#94a3b8}
+.holiday-item:last-child{border-bottom:none}
+.holiday-del{background:none;border:none;color:#7f1d1d;cursor:pointer;font-size:14px;padding:2px 4px}
+.add-holiday-row{display:flex;gap:6px;margin-top:8px}
+.add-holiday-btn{background:#1e3a5f;border:1px solid #2563eb;border-radius:7px;color:#7dd3fc;padding:7px 12px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;white-space:nowrap}
+
 input[type=file]{display:none}
-.empty{text-align:center;padding:24px 0;color:#475569;font-size:13px;line-height:2}
-svg text{font-family:'PingFang SC',sans-serif}
-.tip{font-size:11px;color:#475569;text-align:center;margin-top:12px;line-height:1.7}
+.empty{text-align:center;padding:20px 0;color:#475569;font-size:12px}
+.tip{font-size:11px;color:#475569;text-align:center;margin-top:10px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -158,595 +234,991 @@ svg text{font-family:'PingFang SC',sans-serif}
       <div class="hdr-title">💳 卡片管家</div>
       <div class="hdr-sub" id="hdr-sub">请先导入数据</div>
     </div>
-    <div class="hdr-right">
-      <button class="icon-btn" title="导出数据" onclick="exportData()">⬆️</button>
-      <button class="icon-btn" title="导入数据" onclick="document.getElementById('import-file').click()">⬇️</button>
+    <!-- Only shown on cards tab -->
+    <div class="hdr-btns" id="hdr-btns" style="display:none">
+      <button class="hbtn" onclick="openGrpSheet(null)">＋ 分组</button>
+      <button class="hbtn" onclick="openCardSheet(null,null)">＋ 卡片</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab on" onclick="ST('cards')">卡片</button>
-    <button class="tab" onclick="ST('cal')">日历</button>
-    <button class="tab" onclick="ST('piggy')">储蓄罐</button>
-    <button class="tab" onclick="ST('data')">数据</button>
+    <button class="tab on"  onclick="ST('cards')">卡片</button>
+    <button class="tab"     onclick="ST('cal')">日历</button>
+    <button class="tab"     onclick="ST('piggy')">储蓄罐</button>
+    <button class="tab"     onclick="ST('data')">数据</button>
   </div>
 </div>
 
-<div class="content">
-
+<div class="wrap">
   <!-- CARDS -->
   <div id="p-cards">
-    <div id="cards-inner"></div>
-    <div class="tip" id="cards-tip" style="display:none">点图标可上传Logo · 点状态标签可修改</div>
+    <div id="cards-body"></div>
+    <div class="tip" id="cards-tip" style="display:none">长按拖动 ☰ 排序 · 点图标换Logo · 点状态标签编辑</div>
   </div>
 
   <!-- CALENDAR -->
   <div id="p-cal" style="display:none">
-    <div class="cal-nav">
-      <button class="cal-arrow" onclick="calNav(-1)">‹</button>
-      <div class="cal-month" id="cal-title"></div>
-      <button class="cal-arrow" onclick="calNav(1)">›</button>
+    <div class="cal-subtabs">
+      <button class="cstab on" id="cst-cal" onclick="CST('cal-view')">📅 日历</button>
+      <button class="cstab"    id="cst-ov"  onclick="CST('task-ov')">📋 任务总览</button>
     </div>
-    <div class="cal-legend">
-      <div class="leg-item"><div class="leg-dot" style="background:#f0c040"></div>转账</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#7dd3fc"></div>投资</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#a78bfa"></div>赎回</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#34d399"></div>消费</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#fb923c"></div>季度</div>
+    <div id="cal-view">
+      <div class="cal-nav">
+        <button class="carr" onclick="calNav(-1)">‹</button>
+        <div class="cal-lbl" id="cal-lbl"></div>
+        <button class="carr" onclick="calNav(1)">›</button>
+      </div>
+      <div id="month-bar"></div>
+      <div class="cal-legend">
+        <div class="leg"><div class="ldot" style="background:#f0c040"></div>转账</div>
+        <div class="leg"><div class="ldot" style="background:#7dd3fc"></div>投资/定投</div>
+        <div class="leg"><div class="ldot" style="background:#a78bfa"></div>赎回</div>
+        <div class="leg"><div class="ldot" style="background:#34d399"></div>消费</div>
+        <div class="leg"><div class="ldot" style="background:#fb923c"></div>季度</div>
+        <div class="leg"><div class="ldot" style="background:#c4b5fd"></div>每周/N天</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div id="cal-tasks"></div>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div id="cal-tasks"></div>
+    <div id="task-ov" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="hbtn" onclick="openTaskSheet(null)">＋ 添加任务</button>
+      </div>
+      <div id="tov-body"></div>
+    </div>
   </div>
 
   <!-- PIGGY -->
   <div id="p-piggy" style="display:none">
     <div class="pig-hero">
-      <div style="font-size:38px;margin-bottom:4px">🐷</div>
-      <div style="font-size:12px;color:#c4b5fd;margin-bottom:4px">储蓄罐余额</div>
-      <div class="pig-total" id="pig-total">¥0</div>
+      <div class="pig-hero-top">
+        <span class="pig-hero-lbl">储蓄罐余额</span>
+        <span style="font-size:20px">🐷</span>
+      </div>
+      <div class="pig-tot" id="pig-tot">¥0</div>
+      <div class="pig-card-banner">
+        <span style="font-size:13px">🏦</span>
+        <span class="pig-card-name" id="pig-card-name">未关联卡片</span>
+        <button class="pig-card-change" onclick="openPigCardSheet()">更改</button>
+      </div>
     </div>
-    <input class="pig-input" type="number" id="pig-amt" placeholder="金额（元）">
-    <input class="pig-desc" id="pig-desc" placeholder="备注（可选，如：想买的东西）" style="display:block;width:100%">
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <button class="pig-btn" style="flex:1" onclick="pigAdd()">＋ 存入</button>
-      <button class="pig-btn" style="flex:1;background:linear-gradient(135deg,#7f1d1d,#991b1b)" onclick="pigOut()">－ 转出</button>
+    <input class="pinput" type="number" id="pig-amt" placeholder="金额（元）">
+    <input class="pinput" id="pig-desc" placeholder="备注（如：想买的东西）">
+    <div class="prow">
+      <button class="pbtn pbtn-in"  onclick="pigAdd()">＋ 存入</button>
+      <button class="pbtn pbtn-out" onclick="pigOut()">－ 转出</button>
     </div>
-    <div style="font-size:12px;color:#94a3b8;margin-bottom:8px" id="pig-log-lbl">存款记录</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:7px" id="pig-lbl"></div>
     <div id="pig-log"></div>
   </div>
 
   <!-- DATA -->
   <div id="p-data" style="display:none">
-    <div class="data-card">
-      <div class="data-card-title">📊 数据概览</div>
-      <div class="data-stats" id="data-stats">
-        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">卡片总数</div></div>
-        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">任务总数</div></div>
-        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">活跃账户</div></div>
-        <div class="stat-box"><div class="stat-num">—</div><div class="stat-lbl">储蓄罐余额</div></div>
+    <div class="dcard">
+      <div class="dcard-title">📊 数据概览</div>
+      <div class="dstats" id="data-stats">
+        <div class="sbox"><div class="snum">—</div><div class="slbl">卡片总数</div></div>
+        <div class="sbox"><div class="snum">—</div><div class="slbl">任务总数</div></div>
+        <div class="sbox"><div class="snum">—</div><div class="slbl">活跃账户</div></div>
+        <div class="sbox"><div class="snum">—</div><div class="slbl">储蓄罐余额</div></div>
+      </div>
+    </div>
+    <div class="dcard">
+      <div class="dcard-title">⬇️ 导入数据</div>
+      <div class="dcard-desc">从 JSON 文件导入卡片和任务配置。打卡记录、图标、储蓄罐不会被覆盖。</div>
+      <button class="dbtn imp" onclick="$('fi').click()">选择 JSON 文件导入</button>
+    </div>
+    <div class="dcard">
+      <div class="dcard-title">⬆️ 导出数据</div>
+      <div class="dcard-desc">将所有数据导出为 JSON 备份文件，可用于换设备或恢复。</div>
+      <button class="dbtn exp" onclick="exportData()">导出全部数据</button>
+    </div>
+    <div class="dcard">
+      <div class="dcard-title">🗑️ 重置数据</div>
+      <div class="dcard-desc">清空全部数据，恢复空白状态。请先导出备份！</div>
+      <button class="dbtn rst" onclick="resetAll()">清空所有数据</button>
+    </div>
+  </div>
+</div>
+
+<div id="empty-state" class="empty-state" style="display:none">
+  <div class="eb">💳</div>
+  <div class="et">还没有数据</div>
+  <div class="es">下载「我的数据.json」后点击导入</div>
+  <button class="eibtn" onclick="$('fi').click()">⬇️ 导入数据文件</button>
+</div>
+
+<!-- Sheet: Card -->
+<div class="sheet-wrap" id="sh-card" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('sh-card')"></div>
+  <div class="sheet-box">
+    <div class="sh-title-row">
+      <span class="sh-title" id="sh-card-ttl">卡片</span>
+      <button class="sh-close" onclick="closeSheet('sh-card')">✕</button>
+    </div>
+    <span class="flbl">银行名称</span>
+    <input class="fi" id="cf-bank" placeholder="如：招商银行">
+    <span class="flbl">卡尾号 / 标识（可空）</span>
+    <input class="fi" id="cf-tail" placeholder="如：1234">
+
+    <div class="nocard-row">
+      <span class="nocard-lbl">无实体卡（纯虚拟账户）</span>
+      <button class="tgl" id="cf-nocard-tgl" onclick="toggleNoCard()"><div class="tgl-knob"></div></button>
+    </div>
+
+    <!-- Card network: hidden when virtual -->
+    <div id="cf-net-section">
+      <span class="flbl">卡组织</span>
+      <select class="fsel" id="cf-net">
+        <option value="银联">银联 UnionPay</option>
+        <option value="万事达">万事达 Mastercard</option>
+        <option value="Visa">Visa</option>
+        <option value="运通">美国运通 Amex</option>
+        <option value="JCB">JCB</option>
+        <option value="Diners Club">Diners Club</option>
+      </select>
+    </div>
+
+    <span class="flbl">币种（可选，默认人民币）</span>
+    <select class="fsel" id="cf-currency">
+      <option value="CNY">人民币 CNY</option>
+      <option value="USD">美元 USD</option>
+      <option value="HKD">港币 HKD</option>
+      <option value="EUR">欧元 EUR</option>
+      <option value="GBP">英镑 GBP</option>
+      <option value="JPY">日元 JPY</option>
+      <option value="SGD">新加坡元 SGD</option>
+      <option value="AUD">澳元 AUD</option>
+      <option value="CAD">加拿大元 CAD</option>
+    </select>
+    <span class="flbl">用途 / 角色</span>
+    <input class="fi" id="cf-role" placeholder="如：主力消费">
+    <span class="flbl">备注（可空）</span>
+    <input class="fi" id="cf-note" placeholder="如：定投基金代码">
+    <span class="flbl">分组</span>
+    <select class="fsel" id="cf-grp"></select>
+    <span class="flbl">状态</span>
+    <select class="fsel" id="cf-status">
+      <option value="active">正常使用</option>
+      <option value="pending">待开通</option>
+      <option value="frozen">冻结/停用</option>
+    </select>
+    <span class="flbl">主色</span>
+    <div class="color-row" id="cf-colors"></div>
+    <div class="sdiv"></div>
+    <button class="icon-upbtn" onclick="triggerIconUpload()">📷 上传银行 Logo（可选）</button>
+    <div class="frow">
+      <button class="fbtn-cancel" onclick="closeSheet('sh-card')">取消</button>
+      <button class="fbtn-del" id="cf-del" onclick="cardDelete()" style="display:none">删除</button>
+      <button class="fbtn-save" onclick="cardSave()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sheet: Group -->
+<div class="sheet-wrap" id="sh-grp" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('sh-grp')"></div>
+  <div class="sheet-box">
+    <div class="sh-title-row">
+      <span class="sh-title" id="sh-grp-ttl">分组</span>
+      <button class="sh-close" onclick="closeSheet('sh-grp')">✕</button>
+    </div>
+    <span class="flbl">分组名称</span>
+    <input class="fi" id="gf-name" placeholder="如：港区账户">
+    <span class="flbl">图标（Emoji）</span>
+    <input class="fi" id="gf-icon" placeholder="如：🇭🇰">
+    <div class="frow">
+      <button class="fbtn-cancel" onclick="closeSheet('sh-grp')">取消</button>
+      <button class="fbtn-del" id="gf-del" onclick="grpDelete()" style="display:none">删除分组</button>
+      <button class="fbtn-save" onclick="grpSave()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sheet: Task -->
+<div class="sheet-wrap" id="sh-task" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('sh-task')"></div>
+  <div class="sheet-box">
+    <div class="sh-title-row">
+      <span class="sh-title" id="sh-task-ttl">任务</span>
+      <button class="sh-close" onclick="closeSheet('sh-task')">✕</button>
+    </div>
+    <span class="flbl">任务名称</span>
+    <input class="fi" id="tf-label" placeholder="如：中信 1966 定投扣款">
+    <span class="flbl">金额（可空）</span>
+    <input class="fi" id="tf-amount" placeholder="如：20元">
+    <span class="flbl">类型</span>
+    <select class="fsel" id="tf-type">
+      <option value="transfer">💸 转账</option>
+      <option value="invest">📈 投资/定投</option>
+      <option value="redeem">♻️ 赎回</option>
+      <option value="consume">🛒 消费</option>
+      <option value="quarterly">🔄 季度任务</option>
+    </select>
+    <span class="flbl">周期</span>
+    <select class="fsel" id="tf-freq" onchange="onFreqChange()">
+      <option value="monthly">每月</option>
+      <option value="weekly">每周</option>
+      <option value="quarterly">每季度</option>
+      <option value="ndays">每 N 天</option>
+      <option value="once">一次性</option>
+    </select>
+
+    <div class="freq-box" id="fo-monthly">
+      <span class="flbl" style="margin-top:0">每月第几号</span>
+      <select class="fsel" id="tf-day"></select>
+    </div>
+    <div class="freq-box" id="fo-weekly" style="display:none">
+      <span class="flbl" style="margin-top:0">每周几</span>
+      <select class="fsel" id="tf-weekday">
+        <option value="1">周一</option><option value="2">周二</option><option value="3">周三</option>
+        <option value="4">周四</option><option value="5">周五</option><option value="6">周六</option><option value="0">周日</option>
+      </select>
+    </div>
+    <div class="freq-box" id="fo-quarterly" style="display:none">
+      <span class="flbl" style="margin-top:0">每季度第几号触发</span>
+      <select class="fsel" id="tf-qday"></select>
+      <span class="flbl">触发月份</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px" id="tf-months">
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:#94a3b8"><input type="checkbox" value="1" checked> 1月</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:#94a3b8"><input type="checkbox" value="4" checked> 4月</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:#94a3b8"><input type="checkbox" value="7" checked> 7月</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;color:#94a3b8"><input type="checkbox" value="10" checked> 10月</label>
+      </div>
+    </div>
+    <div class="freq-box" id="fo-ndays" style="display:none">
+      <div class="f2col">
+        <div>
+          <span class="flbl" style="margin-top:0">间隔天数</span>
+          <select class="fsel" id="tf-ndays" onchange="onNdaysChange()">
+            <option value="3">每 3 天</option><option value="5">每 5 天</option><option value="7">每 7 天</option>
+            <option value="10">每 10 天</option><option value="14">每 14 天</option><option value="30">每 30 天</option>
+            <option value="custom">自定义…</option>
+          </select>
+        </div>
+        <div>
+          <span class="flbl" style="margin-top:0">开始日期</span>
+          <input class="fi" id="tf-ndays-start" type="date">
+        </div>
+      </div>
+      <div id="tf-ndays-custom-wrap" style="display:none;margin-top:8px">
+        <span class="flbl" style="margin-top:0">自定义天数</span>
+        <input class="fi" id="tf-ndays-custom" type="number" min="1" placeholder="输入天数">
+      </div>
+    </div>
+    <div class="freq-box" id="fo-once" style="display:none">
+      <span class="flbl" style="margin-top:0">日期</span>
+      <input class="fi" id="tf-once-date" type="date">
+    </div>
+
+    <div id="trading-section" style="margin-top:12px">
+      <div class="sdiv" style="margin-top:0"></div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:8px;font-weight:600">🏛 非交易日处理</div>
+      <div class="toggle-row">
+        <div><div class="toggle-lbl">启用非交易日顺延</div><div class="toggle-sub">遇节假日/休市，顺延到下一交易日</div></div>
+        <button class="tgl" id="tgl-postpone" onclick="toggleTgl('tgl-postpone')"><div class="tgl-knob"></div></button>
+      </div>
+      <div class="toggle-row">
+        <div><div class="toggle-lbl">将周末视为非交易日</div></div>
+        <button class="tgl on" id="tgl-weekend" onclick="toggleTgl('tgl-weekend')"><div class="tgl-knob"></div></button>
+      </div>
+      <div style="font-size:12px;color:#64748b;margin-top:10px;margin-bottom:6px;font-weight:600">📅 休市日期</div>
+      <div id="holiday-list"></div>
+      <div class="add-holiday-row">
+        <input class="fi" id="holiday-input" type="date" style="flex:1;margin-bottom:0">
+        <button class="add-holiday-btn" onclick="addHoliday()">添加</button>
       </div>
     </div>
 
-    <div class="data-card">
-      <div class="data-card-title">⬇️ 导入数据</div>
-      <div class="data-card-desc">从 JSON 文件导入卡片和任务数据。导入不会覆盖你的打卡记录和自定义图标，只更新卡片列表和任务配置。</div>
-      <button class="data-btn import" onclick="document.getElementById('import-file').click()">选择 JSON 文件导入</button>
-    </div>
-
-    <div class="data-card">
-      <div class="data-card-title">⬆️ 导出数据</div>
-      <div class="data-card-desc">将当前所有数据（包括卡片、任务、打卡记录、储蓄罐）导出为 JSON 文件，用于备份或迁移。</div>
-      <button class="data-btn export" onclick="exportData()">导出全部数据</button>
-    </div>
-
-    <div class="data-card">
-      <div class="data-card-title">🗑️ 重置数据</div>
-      <div class="data-card-desc">清空所有数据，恢复空白状态。此操作不可撤销，请提前导出备份。</div>
-      <button class="data-btn reset" onclick="resetAll()">清空所有数据</button>
+    <div class="frow">
+      <button class="fbtn-cancel" onclick="closeSheet('sh-task')">取消</button>
+      <button class="fbtn-del" id="tf-del" onclick="taskDelete()" style="display:none">删除</button>
+      <button class="fbtn-save" onclick="taskSave()">保存</button>
     </div>
   </div>
-
 </div>
 
-<!-- Empty state (shown when no data) -->
-<div id="empty-state" class="empty-state" style="display:none">
-  <div class="big">💳</div>
-  <div class="ttl">还没有数据</div>
-  <div class="sub">导入你的 JSON 数据文件<br>即可开始管理所有银行卡</div>
-  <button class="empty-import-btn" onclick="document.getElementById('import-file').click()">⬇️ 导入数据文件</button>
-</div>
-
-<!-- Card sheet -->
-<div class="sheet-wrap" id="card-sheet" style="display:none">
-  <div class="sheet-bg" onclick="closeSheet('card-sheet')"></div>
+<!-- Sheet: Piggy card select -->
+<div class="sheet-wrap" id="sh-pig-card" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('sh-pig-card')"></div>
   <div class="sheet-box">
-    <div class="sheet-title">修改卡片</div>
-    <div class="sheet-name" id="cs-name"></div>
-    <div class="sopt" id="sopt-active" onclick="setStatus('active')">
-      <div class="sdot" style="background:#4ade80"></div>
-      <div><div class="sopt-label" style="color:#4ade80">正常使用</div><div class="sopt-desc">活跃，参与保活计划</div></div>
+    <div class="sh-title-row">
+      <span class="sh-title">选择关联卡片</span>
+      <button class="sh-close" onclick="closeSheet('sh-pig-card')">✕</button>
     </div>
-    <div class="sopt" id="sopt-pending" onclick="setStatus('pending')">
-      <div class="sdot" style="background:#7dd3fc"></div>
-      <div><div class="sopt-label" style="color:#7dd3fc">待开通</div><div class="sopt-desc">尚未开户，计划中</div></div>
-    </div>
-    <div class="sopt" id="sopt-frozen" onclick="setStatus('frozen')">
-      <div class="sdot" style="background:#9ca3af"></div>
-      <div><div class="sopt-label" style="color:#9ca3af">冻结 / 停用</div><div class="sopt-desc">暂不可用</div></div>
-    </div>
-    <div class="sdiv"></div>
-    <div class="icon-actions">
-      <button class="ia-btn ia-upload" onclick="triggerUpload()">📷 上传银行Logo</button>
-      <button class="ia-btn ia-reset" onclick="resetIcon()">✕ 恢复默认</button>
+    <div id="pig-card-list"></div>
+    <div style="margin-top:10px">
+      <div onclick="setPigCard('')" style="padding:12px;border-radius:9px;border:1.5px solid #334155;color:#64748b;font-size:13px;cursor:pointer;text-align:center">不关联卡片</div>
     </div>
   </div>
 </div>
 
-<!-- Piggy edit sheet -->
-<div class="sheet-wrap" id="pig-sheet" style="display:none">
-  <div class="sheet-bg" onclick="closeSheet('pig-sheet')"></div>
+<!-- Sheet: Piggy entry edit -->
+<div class="sheet-wrap" id="sh-pig" style="display:none">
+  <div class="sheet-bg" onclick="closeSheet('sh-pig')"></div>
   <div class="sheet-box">
-    <div class="sheet-title">编辑记录</div>
-    <input class="edit-input" id="edit-amt" type="number" placeholder="金额">
-    <input class="edit-input" id="edit-desc" placeholder="备注">
-    <div class="edit-row">
-      <button class="edit-cancel" onclick="closeSheet('pig-sheet')">取消</button>
-      <button class="edit-save" onclick="pigSaveEdit()">保存</button>
+    <div class="sh-title-row">
+      <span class="sh-title">编辑记录</span>
+      <button class="sh-close" onclick="closeSheet('sh-pig')">✕</button>
+    </div>
+    <span class="flbl">金额</span>
+    <input class="fi" id="pe-amt" type="number" placeholder="金额">
+    <span class="flbl">备注</span>
+    <input class="fi" id="pe-desc" placeholder="备注">
+    <div class="frow">
+      <button class="fbtn-cancel" onclick="closeSheet('sh-pig')">取消</button>
+      <button class="fbtn-save" onclick="pigSaveEdit()">保存</button>
     </div>
   </div>
 </div>
 
-<input type="file" id="import-file" accept=".json" onchange="importData(event)">
-<input type="file" id="icon-upload" accept="image/*" onchange="handleIconUpload(event)">
+<input type="file" id="fi" accept=".json" onchange="importData(event)">
+<input type="file" id="icon-fi" accept="image/*" onchange="handleIconUpload(event)">
 
 <script>
-// ──────────────────────────────────────────────
-//  State
-// ──────────────────────────────────────────────
-let D = null;           // imported data
-let curTab = 'cards';
-let calYear, calMonth;  // 1-12
-let selDay = null;
-let curCardId = null;
-let editPigId = null;
-// userState stored in localStorage
-let US = { cl:{}, qcl:{}, cc:{}, pig:[] };
-
-const NC={"银联":"#e60012","万事达":"#eb001b","Visa美元":"#1a1f71","Visa":"#1a1f71","运通":"#007bc0","账户":"#64748b"};
-const NB={"银联":"#fff0f0","万事达":"#fff0f0","Visa美元":"#eef0ff","Visa":"#eef0ff","运通":"#e8f4fc","账户":"#f1f5f9"};
-const TC_COLOR={transfer:"#f0c040",invest:"#7dd3fc",redeem:"#a78bfa",consume:"#34d399",quarterly:"#fb923c"};
-const TC_ICON={transfer:"💸",invest:"📈",redeem:"♻️",consume:"🛒",quarterly:"🔄"};
-const TC_LABEL={transfer:"转账操作",invest:"循环申购",redeem:"月底赎回",consume:"消费记录",quarterly:"季度操作"};
-const DOW=["日","一","二","三","四","五","六"];
-
-// ──────────────────────────────────────────────
-//  Persistence helpers
-// ──────────────────────────────────────────────
-function sv(k,v){try{localStorage.setItem(k,typeof v==="string"?v:JSON.stringify(v));}catch(e){}}
+const $=id=>document.getElementById(id);
+function sv(k,v){try{localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));}catch(e){}}
 function ld(k){try{return localStorage.getItem(k);}catch(e){return null;}}
-function saveUS(){sv("us",US);}
-function loadUS(){const s=ld("us");if(s)US=JSON.parse(s);}
-function saveD(){if(D)sv("appdata",D);}
-function loadD(){const s=ld("appdata");if(s){D=JSON.parse(s);return true;}return false;}
 
-// ──────────────────────────────────────────────
-//  Boot
-// ──────────────────────────────────────────────
+const COLORS=['#c8102e','#e60012','#db0011','#003087','#007a33','#0066cc','#c8a951','#ff6b35','#6c35de','#1677ff','#00d45e','#374151'];
+const NC_MAP={银联:{c:'#e60012',b:'#fff0f0'},万事达:{c:'#eb001b',b:'#fff0f0'},Visa:{c:'#1a1f71',b:'#eef0ff'},运通:{c:'#007bc0',b:'#e8f4fc'},JCB:{c:'#003087',b:'#e8f0ff'},'Diners Club':{c:'#555',b:'#1e293b'}};
+const TC={transfer:'#f0c040',invest:'#7dd3fc',redeem:'#a78bfa',consume:'#34d399',quarterly:'#fb923c',weekly:'#c4b5fd'};
+const TI={transfer:'💸',invest:'📈',redeem:'♻️',consume:'🛒',quarterly:'🔄',weekly:'📅'};
+const TL={transfer:'转账',invest:'投资/定投',redeem:'赎回',consume:'消费',quarterly:'季度任务',weekly:'每周'};
+const DOW_CN=['日','一','二','三','四','五','六'];
+const DOW_FULL=['周日','周一','周二','周三','周四','周五','周六'];
+
+let D=null;
+let US={cl:{},cc:{},pig:[],pigCard:'',grpCollapsed:{},tovCollapsed:{}};
+let curTab='cards',calSub='cal-view';
+let calY,calM,selDay=null;
+let editCardId=null,editGrpId=null,editTaskId=null,editTaskSection=null,editPigId=null;
+let iconTargetId=null,cfNoCard=false;
+let tmpHolidays=[];
+
+// drag state
+let dragSrc=null,dragGrpId=null;
+
+function saveUS(){sv('us',US);}
+function loadUS(){const s=ld('us');if(s)try{US={...US,...JSON.parse(s)};}catch(e){}}
+function saveD(){if(D)sv('appdata',D);}
+function loadD(){const s=ld('appdata');if(s)try{D=JSON.parse(s);return true;}catch(e){}return false;}
+
+function dayOpts(max=31){return Array.from({length:max},(_,i)=>i+1).map(d=>`<option value="${d}">${d}号</option>`).join('');}
+
 function init(){
   loadUS();
-  const now=new Date();
-  calYear=now.getFullYear();calMonth=now.getMonth()+1;
-  if(loadD()){
-    boot();
-  } else {
-    showEmpty();
-  }
+  const now=new Date();calY=now.getFullYear();calM=now.getMonth()+1;
+  $('tf-day').innerHTML=dayOpts(31);
+  $('tf-qday').innerHTML=dayOpts(28);
+  if(loadD())boot();else showEmpty();
 }
 
 function boot(){
-  hideEmpty();
-  updateHeader();
-  renderCards();
-  renderCal();
-  renderPiggy();
-  renderDataPage();
+  $('empty-state').style.display='none';
+  $('p-cards').style.display='block';
+  $('cards-tip').style.display='block';
+  updateHdr();renderCards();renderCal();renderTaskOv();renderPiggy();renderDataPage();
 }
-
 function showEmpty(){
-  document.getElementById("empty-state").style.display="block";
-  document.getElementById("p-cards").style.display="none";
-  document.getElementById("cards-tip").style.display="none";
+  $('empty-state').style.display='block';
+  $('p-cards').style.display='none';
+  $('cards-tip').style.display='none';
+  $('hdr-btns').style.display='none';
 }
-function hideEmpty(){
-  document.getElementById("empty-state").style.display="none";
-  document.getElementById("p-cards").style.display="block";
-  document.getElementById("cards-tip").style.display="block";
-}
-
-function updateHeader(){
+function updateHdr(){
   if(!D)return;
   const now=new Date();
-  const all=allCards();
-  const active=all.filter(c=>gst(c.id)==="active").length;
-  document.getElementById("hdr-sub").textContent=`${now.getFullYear()}年${now.getMonth()+1}月 · ${active} 张活跃`;
+  const active=(D.cards||[]).filter(c=>gst(c.id)==='active').length;
+  $('hdr-sub').textContent=`${now.getFullYear()}年${now.getMonth()+1}月 · ${active}张活跃`;
 }
 
-// ──────────────────────────────────────────────
-//  Import / Export
-// ──────────────────────────────────────────────
+// ── import/export ──
 function importData(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{
     try{
       const json=JSON.parse(ev.target.result);
-      // Accept both full export and data-only file
-      if(json.data){
-        // full export
-        D=json.data;
-        if(json.userState) US=json.userState;
-      } else {
-        // data-only file
-        D=json;
-      }
-      saveD();saveUS();
-      boot();
-      alert("✅ 导入成功！");
-    }catch(err){
-      alert("❌ 导入失败：文件格式不正确\n"+err.message);
-    }
+      if(json.data){D=json.data;if(json.userState)US={...US,...json.userState,pig:US.pig};}
+      else D=json;
+      saveD();saveUS();boot();alert('✅ 导入成功！');
+    }catch(err){alert('❌ 导入失败：'+err.message);}
   };
-  r.readAsText(f);
-  e.target.value="";
+  r.readAsText(f);e.target.value='';
 }
-
 function exportData(){
-  if(!D){alert("请先导入数据");return;}
-  const payload={
-    exportTime:new Date().toISOString(),
-    data:D,
-    userState:US
-  };
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  const now=new Date();
-  a.href=url;
-  a.download=`卡片管家备份_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.json`;
+  if(!D){alert('请先导入数据');return;}
+  const blob=new Blob([JSON.stringify({exportTime:new Date().toISOString(),data:D,userState:US},null,2)],{type:'application/json'});
+  const a=document.createElement('a'),now=new Date();
+  a.href=URL.createObjectURL(blob);
+  a.download=`卡片管家备份_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.json`;
   a.click();
-  URL.revokeObjectURL(url);
 }
-
 function resetAll(){
-  if(!confirm("确定要清空所有数据吗？此操作不可撤销！")) return;
-  D=null; US={cl:{},qcl:{},cc:{},pig:[]};
+  if(!confirm('确定清空所有数据？'))return;
+  D=null;US={cl:{},cc:{},pig:[],pigCard:'',grpCollapsed:{},tovCollapsed:{}};
   try{localStorage.clear();}catch(e){}
   showEmpty();
 }
 
-// ──────────────────────────────────────────────
-//  Cards
-// ──────────────────────────────────────────────
-function allCards(){
-  if(!D)return[];
-  return [...(D.cards.mainland||[]),...(D.cards.hk||[])];
-}
-function gst(id){return(US.cc[id]&&US.cc[id].status)||allCards().find(c=>c.id===id)?.status||"active";}
+function gst(id){return(US.cc[id]&&US.cc[id].status)||(D.cards||[]).find(c=>c.id===id)?.status||'active';}
 function gic(id){return US.cc[id]&&US.cc[id].icon||null;}
+function allCards(){return D?D.cards||[]:[]}
+function getCardName(id){if(!id)return '';const c=allCards().find(x=>x.id===id);return c?`${c.bank}${c.tail?' *'+c.tail:''}`:'';}
 
+// ── CARDS ──
 function renderCards(){
-  if(!D){document.getElementById("cards-inner").innerHTML="";return;}
-  const ml=D.cards.mainland||[], hk=D.cards.hk||[];
-  let h="";
-  if(ml.length){
-    h+=`<div class="sec-hdr"><span>🏦</span><span class="sec-title">内地借记卡</span><span class="cnt">${ml.length}</span></div>`;
-    h+=ml.map(cardH).join("");
-  }
-  if(hk.length){
-    h+=`<div class="sec-hdr" style="margin-top:18px"><span>🇭🇰</span><span class="sec-title">港区账户</span><span class="cnt">${hk.length}</span></div>`;
-    h+=hk.map(cardH).join("");
-  }
-  document.getElementById("cards-inner").innerHTML=h;
+  if(!D){$('cards-body').innerHTML='';return;}
+  let h='';
+  (D.groups||[]).forEach(g=>{
+    const gc=allCards().filter(c=>c.groupId===g.id);
+    const collapsed=!!US.grpCollapsed[g.id];
+    h+=`<div class="grp-hdr${collapsed?' collapsed':''}" onclick="toggleGrp(event,'${g.id}')">
+      <span class="grp-icon">${g.icon||'📁'}</span>
+      <span class="grp-name">${g.name}</span>
+      <span class="grp-cnt">${gc.length}</span>
+      <div class="grp-actions">
+        <button class="grp-edit-btn" onclick="event.stopPropagation();openGrpSheet('${g.id}')">✏️</button>
+      </div>
+      <span class="grp-chevron${collapsed?'':' open'}">›</span>
+    </div>`;
+    if(!collapsed){
+      h+=`<div class="grp-body" data-grp="${g.id}">`;
+      gc.forEach(c=>{h+=cardH(c,g.id);});
+      h+=`<div class="grp-add-btn" onclick="openCardSheet(null,'${g.id}')">＋ 添加卡片</div></div>`;
+    }
+  });
+  h+=`<button class="add-grp-btn" onclick="openGrpSheet(null)">＋ 添加新分组</button>`;
+  $('cards-body').innerHTML=h;
+  // attach drag events
+  attachDrag();
 }
 
-function cardH(c){
-  const st=gst(c.id), ic=gic(c.id);
-  const sl={active:"s-active",frozen:"s-frozen",pending:"s-pending"};
-  const sl2={active:"正常",frozen:"冻结",pending:"待开"};
-  return `<div class="ci s-${st}">
+function toggleGrp(e,gid){
+  // don't collapse when clicking edit button
+  if(e.target.closest('.grp-edit-btn'))return;
+  US.grpCollapsed[gid]=!US.grpCollapsed[gid];
+  saveUS();renderCards();
+}
+
+function cardH(c,gid){
+  const st=gst(c.id),ic=gic(c.id);
+  const nm={active:'正常',frozen:'冻结',pending:'待开'};
+  const sc={active:'stbtn s-active',frozen:'stbtn s-frozen',pending:'stbtn s-pending'};
+  const nc=NC_MAP[c.network]||{c:'#94a3b8',b:'#1e293b'};
+  const curr=c.currency&&c.currency!=='CNY'?` · ${c.currency}`:'';
+  const netLabel=c.noCard?`虚拟${curr?curr:''}`:(c.network||'')+(curr);
+  const netBg=c.noCard?'#1e293b':nc.b;
+  const netC=c.noCard?'#64748b':nc.c;
+  return `<div class="ci s-${st}" data-id="${c.id}" data-grp="${gid}" draggable="true">
+    <span class="drag-handle" title="拖动排序">☰</span>
     <div class="ci-icon" onclick="openCardSheet('${c.id}')">
-      <div class="ci-icon-inner" style="background:${ic?"#1e293b":c.color+"22"};border:1px solid ${ic?"#334155":c.color+"44"}">
-        ${ic?`<img src="${ic}">`:`<div class="ci-dot" style="background:${c.color};opacity:${st==="pending"?.35:.9}"></div>`}
+      <div class="ci-img" style="background:${ic?'#1e293b':c.color+'22'};border:1px solid ${ic?'#334155':c.color+'44'}">
+        ${ic?`<img src="${ic}">`:`<div class="ci-dot" style="background:${c.color};opacity:${st==='pending'?.3:.9}"></div>`}
       </div>
-      <div class="ci-overlay">📷</div>
+      <div class="ci-ov">📷</div>
     </div>
-    <div class="ci-info">
-      <div class="ci-name-row">
-        <span class="ci-name">${c.bank}</span>
-        ${c.tail?`<span class="ci-tail">*${c.tail}</span>`:""}
-        <button class="sbtn ${sl[st]}" onclick="openCardSheet('${c.id}')">${sl2[st]}</button>
+    <div class="ci-body">
+      <div class="ci-top">
+        <span class="ci-bank">${c.bank}</span>
+        ${c.tail?`<span class="ci-tail">*${c.tail}</span>`:''}
+        <button class="${sc[st]}" onclick="openCardSheet('${c.id}')">${nm[st]}</button>
       </div>
       <div class="ci-meta">
-        <span class="nbadge" style="background:${NB[c.network]||"#1e293b"};color:${NC[c.network]||"#94a3b8"}">${c.network}</span>
-        <span class="ci-role">${c.role}</span>
+        <span class="nbadge" style="background:${netBg};color:${netC}">${netLabel}</span>
+        <span class="ci-role">${c.role||''}</span>
       </div>
-      ${c.note?`<div class="ci-note">${c.note}</div>`:""}
+      ${c.note?`<div class="ci-note">${c.note}</div>`:''}
     </div>
+    <button class="ci-edit" onclick="openCardSheet('${c.id}')">✏️</button>
   </div>`;
 }
 
-function openCardSheet(id){
-  curCardId=id;
-  const c=allCards().find(x=>x.id===id);
-  const st=gst(id);
-  document.getElementById("cs-name").textContent=c.bank+(c.tail?" *"+c.tail:"");
-  ["active","pending","frozen"].forEach(s=>document.getElementById("sopt-"+s).classList.toggle("sel",s===st));
-  document.getElementById("card-sheet").style.display="flex";
-}
-function setStatus(st){
-  if(!curCardId)return;
-  if(!US.cc[curCardId])US.cc[curCardId]={};
-  US.cc[curCardId].status=st;
-  saveUS();closeSheet("card-sheet");renderCards();updateHeader();
-}
-function triggerUpload(){document.getElementById("icon-upload").value="";document.getElementById("icon-upload").click();}
-function handleIconUpload(e){
-  const f=e.target.files[0];if(!f||!curCardId)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    if(!US.cc[curCardId])US.cc[curCardId]={};
-    US.cc[curCardId].icon=ev.target.result;
-    saveUS();closeSheet("card-sheet");renderCards();
-  };r.readAsDataURL(f);
-}
-function resetIcon(){
-  if(!curCardId)return;
-  if(US.cc[curCardId])delete US.cc[curCardId].icon;
-  saveUS();closeSheet("card-sheet");renderCards();
+// ── DRAG TO SORT ──
+function attachDrag(){
+  document.querySelectorAll('.ci[draggable]').forEach(el=>{
+    el.addEventListener('dragstart',onDragStart);
+    el.addEventListener('dragover',onDragOver);
+    el.addEventListener('drop',onDrop);
+    el.addEventListener('dragend',onDragEnd);
+    // touch support
+    el.addEventListener('touchstart',onTouchStart,{passive:true});
+  });
 }
 
-// ──────────────────────────────────────────────
-//  Calendar
-// ──────────────────────────────────────────────
-function calNav(dir){
-  calMonth+=dir;
-  if(calMonth>12){calMonth=1;calYear++;}
-  if(calMonth<1){calMonth=12;calYear--;}
-  selDay=null;
-  renderCal();
+function onDragStart(e){
+  dragSrc=e.currentTarget;
+  dragGrpId=dragSrc.dataset.grp;
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>dragSrc.classList.add('dragging'),0);
+}
+function onDragOver(e){
+  e.preventDefault();
+  const el=e.currentTarget;
+  if(el===dragSrc||el.dataset.grp!==dragGrpId)return;
+  document.querySelectorAll('.ci.drag-over').forEach(x=>x.classList.remove('drag-over'));
+  el.classList.add('drag-over');
+}
+function onDrop(e){
+  e.preventDefault();
+  const target=e.currentTarget;
+  if(!dragSrc||target===dragSrc||target.dataset.grp!==dragGrpId)return;
+  const srcId=dragSrc.dataset.id,tgtId=target.dataset.id;
+  const arr=D.cards;
+  const si=arr.findIndex(c=>c.id===srcId),ti=arr.findIndex(c=>c.id===tgtId);
+  if(si<0||ti<0)return;
+  const [moved]=arr.splice(si,1);arr.splice(ti,0,moved);
+  saveD();renderCards();
+}
+function onDragEnd(){
+  document.querySelectorAll('.ci').forEach(x=>{x.classList.remove('dragging','drag-over');});
+  dragSrc=null;
+}
+
+// Simple touch-based drag (swap on release near another card)
+let touchDragEl=null,touchClone=null,touchStartY=0;
+function onTouchStart(e){
+  const handle=e.target.closest('.drag-handle');if(!handle)return;
+  touchDragEl=e.currentTarget;
+  touchStartY=e.touches[0].clientY;
+  touchDragEl.classList.add('dragging');
+  // clone for visual
+  touchClone=touchDragEl.cloneNode(true);
+  touchClone.style.cssText=`position:fixed;left:${touchDragEl.getBoundingClientRect().left}px;top:${touchDragEl.getBoundingClientRect().top}px;width:${touchDragEl.offsetWidth}px;opacity:.8;pointer-events:none;z-index:999;border-radius:8px;background:#1e3a5f;`;
+  document.body.appendChild(touchClone);
+  document.addEventListener('touchmove',onTouchMove,{passive:false});
+  document.addEventListener('touchend',onTouchEnd);
+}
+function onTouchMove(e){
+  e.preventDefault();
+  const t=e.touches[0];
+  if(touchClone)touchClone.style.top=(t.clientY-20)+'px';
+}
+function onTouchEnd(e){
+  document.removeEventListener('touchmove',onTouchMove);
+  document.removeEventListener('touchend',onTouchEnd);
+  if(touchClone){touchClone.remove();touchClone=null;}
+  if(!touchDragEl)return;
+  const t=e.changedTouches[0];
+  const el=document.elementFromPoint(t.clientX,t.clientY);
+  const target=el?.closest('.ci');
+  if(target&&target!==touchDragEl&&target.dataset.grp===touchDragEl.dataset.grp){
+    const arr=D.cards;
+    const si=arr.findIndex(c=>c.id===touchDragEl.dataset.id);
+    const ti=arr.findIndex(c=>c.id===target.dataset.id);
+    if(si>=0&&ti>=0){const [m]=arr.splice(si,1);arr.splice(ti,0,m);saveD();}
+  }
+  touchDragEl.classList.remove('dragging');
+  touchDragEl=null;
+  renderCards();
+}
+
+// ── CARD SHEET ──
+function toggleNoCard(){
+  cfNoCard=!cfNoCard;
+  $('cf-nocard-tgl').className='tgl'+(cfNoCard?' on':'');
+  $('cf-net-section').style.display=cfNoCard?'none':'block';
+}
+
+function openCardSheet(id,defaultGrp){
+  editCardId=id;iconTargetId=id||'__new__';
+  const card=id?allCards().find(c=>c.id===id):null;
+  $('sh-card-ttl').textContent=card?`编辑 ${card.bank}`:'添加新卡片';
+  $('cf-bank').value=card?.bank||'';
+  $('cf-tail').value=card?.tail||'';
+  $('cf-role').value=card?.role||'';
+  $('cf-note').value=card?.note||'';
+  $('cf-status').value=card?gst(card.id):'active';
+  cfNoCard=card?.noCard||false;
+  $('cf-nocard-tgl').className='tgl'+(cfNoCard?' on':'');
+  $('cf-net-section').style.display=cfNoCard?'none':'block';
+  let net=card?.network||'银联';
+  if(net==='Visa美元'||net==='账户')net='Visa';
+  $('cf-net').value=net;
+  $('cf-currency').value=card?.currency||'CNY';
+  $('cf-grp').innerHTML=(D.groups||[]).map(g=>`<option value="${g.id}"${g.id===(card?.groupId||defaultGrp||((D.groups||[])[0]?.id))?' selected':''}>${g.name}</option>`).join('');
+  const selC=card?.color||COLORS[0];
+  $('cf-colors').innerHTML=COLORS.map(col=>`<div class="cswatch${col===selC?' sel':''}" style="background:${col}" onclick="selColor('${col}')"></div>`).join('');
+  $('cf-del').style.display=id?'block':'none';
+  $('sh-card').style.display='flex';
+}
+function selColor(col){
+  document.querySelectorAll('.cswatch').forEach(el=>el.classList.toggle('sel',el.style.backgroundColor===col||el.style.background===col));
+}
+function cardSave(){
+  if(!D)return;
+  const bank=$('cf-bank').value.trim();if(!bank){alert('请填写银行名称');return;}
+  const sel=document.querySelector('.cswatch.sel');
+  const color=sel?sel.style.backgroundColor||sel.style.background:COLORS[0];
+  const status=$('cf-status').value;
+  const cardObj={bank,tail:$('cf-tail').value.trim(),network:cfNoCard?null:$('cf-net').value,currency:$('cf-currency').value,role:$('cf-role').value.trim(),note:$('cf-note').value.trim(),groupId:$('cf-grp').value,color,noCard:cfNoCard};
+  if(editCardId){
+    const idx=allCards().findIndex(c=>c.id===editCardId);
+    if(idx>=0)D.cards[idx]={...D.cards[idx],...cardObj};
+    if(!US.cc[editCardId])US.cc[editCardId]={};
+    US.cc[editCardId].status=status;
+  } else {
+    const newId='c-'+Date.now();
+    if(!D.cards)D.cards=[];
+    D.cards.push({id:newId,...cardObj,status});
+    if(US.cc['__new__']){US.cc[newId]=US.cc['__new__'];delete US.cc['__new__'];}
+  }
+  saveD();saveUS();closeSheet('sh-card');renderCards();updateHdr();renderDataPage();
+}
+function cardDelete(){
+  if(!editCardId||!confirm('确定删除这张卡片？'))return;
+  D.cards=allCards().filter(c=>c.id!==editCardId);
+  delete US.cc[editCardId];
+  if(US.pigCard===editCardId)US.pigCard='';
+  saveD();saveUS();closeSheet('sh-card');renderCards();updateHdr();renderDataPage();renderPiggy();
+}
+function triggerIconUpload(){$('icon-fi').value='';$('icon-fi').click();}
+function handleIconUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const id=iconTargetId;if(!id)return;
+    if(!US.cc[id])US.cc[id]={};
+    US.cc[id].icon=ev.target.result;
+    saveUS();if(editCardId)renderCards();
+  };r.readAsDataURL(f);
+}
+
+// ── GROUPS ──
+function openGrpSheet(id){
+  editGrpId=id;
+  const g=id?(D.groups||[]).find(x=>x.id===id):null;
+  $('sh-grp-ttl').textContent=g?`编辑「${g.name}」`:'添加新分组';
+  $('gf-name').value=g?.name||'';
+  $('gf-icon').value=g?.icon||'📁';
+  $('gf-del').style.display=id?'block':'none';
+  $('sh-grp').style.display='flex';
+}
+function grpSave(){
+  if(!D)return;
+  const name=$('gf-name').value.trim();if(!name){alert('请填写分组名称');return;}
+  const icon=$('gf-icon').value.trim()||'📁';
+  if(editGrpId){const idx=(D.groups||[]).findIndex(g=>g.id===editGrpId);if(idx>=0)D.groups[idx]={...D.groups[idx],name,icon};}
+  else{if(!D.groups)D.groups=[];D.groups.push({id:'g-'+Date.now(),name,icon});}
+  saveD();closeSheet('sh-grp');renderCards();
+}
+function grpDelete(){
+  if(!editGrpId)return;
+  const cnt=allCards().filter(c=>c.groupId===editGrpId).length;
+  const gname=(D.groups||[]).find(g=>g.id===editGrpId)?.name;
+  if(cnt>0&&!confirm(`「${gname}」下有${cnt}张卡，删除后一并移除，确定吗？`))return;
+  D.groups=(D.groups||[]).filter(g=>g.id!==editGrpId);
+  D.cards=allCards().filter(c=>c.groupId!==editGrpId);
+  saveD();closeSheet('sh-grp');renderCards();updateHdr();renderDataPage();
+}
+
+// ── CALENDAR ──
+function calNav(dir){calM+=dir;if(calM>12){calM=1;calY++;}if(calM<1){calM=12;calY--;}selDay=null;renderCal();}
+function CST(sub){
+  calSub=sub;
+  $('cal-view').style.display=sub==='cal-view'?'block':'none';
+  $('task-ov').style.display=sub==='task-ov'?'block':'none';
+  $('cst-cal').className='cstab'+(sub==='cal-view'?' on':'');
+  $('cst-ov').className='cstab'+(sub==='task-ov'?' on':'');
+  if(sub==='task-ov')renderTaskOv();
 }
 
 function getTasksForDay(y,m,d){
   if(!D)return[];
   const tasks=[];
-  // Monthly tasks
-  (D.monthlyTasks||[]).forEach(t=>{
-    if(t.day===d) tasks.push({...t,_type:"monthly",_y:y,_m:m,_d:d});
+  const dow=new Date(y,m-1,d).getDay();
+  (D.monthlyTasks||[]).forEach(t=>{if(t.day===d)tasks.push({...t,_freq:'monthly',_y:y,_m:m,_d:d});});
+  (D.quarterlyTasks||[]).forEach(t=>{if((t.months||[]).includes(m)&&t.day===d)tasks.push({...t,_freq:'quarterly',_y:y,_m:m,_d:d});});
+  (D.weeklyTasks||[]).forEach(t=>{if(t.weekday===dow)tasks.push({...t,_freq:'weekly',_y:y,_m:m,_d:d});});
+  (D.ndaysTasks||[]).forEach(t=>{
+    if(!t.startDate)return;
+    const start=new Date(t.startDate),cur=new Date(y,m-1,d);
+    if(cur<start)return;
+    const diff=Math.round((cur-start)/86400000),n=parseInt(t.ndays)||1;
+    if(diff%n===0)tasks.push({...t,_freq:'ndays',_y:y,_m:m,_d:d});
   });
-  // Quarterly tasks
-  (D.quarterlyTasks||[]).forEach(t=>{
-    if((t.months||[]).includes(m)&&t.day===d) tasks.push({...t,_type:"quarterly",_y:y,_m:m,_d:d});
+  (D.onceTasks||[]).forEach(t=>{
+    if(!t.date)return;
+    const dd=new Date(t.date);
+    if(dd.getFullYear()===y&&dd.getMonth()+1===m&&dd.getDate()===d)tasks.push({...t,_freq:'once',_y:y,_m:m,_d:d});
   });
   return tasks;
 }
-
-function ckeyM(y,m,id){return`m-${y}-${m}-${id}`;}
-function ckeyQ(y,m,id){return`q-${y}-${m}-${id}`;}
-function isChecked(task){
-  if(task._type==="monthly") return !!US.cl[ckeyM(task._y,task._m,task.id)];
-  return !!US.cl[ckeyQ(task._y,task._m,task.id)];
+function ckey(t){
+  if(t._freq==='monthly')return`m-${t._y}-${t._m}-${t.id}`;
+  if(t._freq==='quarterly')return`q-${t._y}-${t._m}-${t.id}`;
+  if(t._freq==='weekly')return`w-${t._y}-${t._m}-${t._d}-${t.id}`;
+  if(t._freq==='ndays')return`n-${t._y}-${t._m}-${t._d}-${t.id}`;
+  return`o-${t.id}`;
 }
-function toggleTask(task){
-  const k=task._type==="monthly"?ckeyM(task._y,task._m,task.id):ckeyQ(task._y,task._m,task.id);
-  US.cl[k]=!US.cl[k];
-  saveUS();renderCal();
-}
+function isChecked(t){return!!US.cl[ckey(t)];}
+function toggleTask(tJson){const t=JSON.parse(tJson);const k=ckey(t);US.cl[k]=!US.cl[k];saveUS();renderCal();}
 
 function renderCal(){
-  if(!D){document.getElementById("cal-grid").innerHTML="";document.getElementById("cal-tasks").innerHTML="";return;}
-  const now=new Date();
-  const today={y:now.getFullYear(),m:now.getMonth()+1,d:now.getDate()};
-  document.getElementById("cal-title").textContent=`${calYear}年${calMonth}月`;
-
-  // Build grid
-  const firstDay=new Date(calYear,calMonth-1,1).getDay(); // 0=Sun
-  const daysInMonth=new Date(calYear,calMonth,0).getDate();
-  const prevDays=new Date(calYear,calMonth-1,0).getDate();
-
-  let h=DOW.map(d=>`<div class="cal-dow">${d}</div>`).join("");
-
+  if(!D){$('cal-grid').innerHTML='';$('cal-tasks').innerHTML='';$('month-bar').innerHTML='';return;}
+  const now=new Date(),today={y:now.getFullYear(),m:now.getMonth()+1,d:now.getDate()};
+  $('cal-lbl').textContent=`${calY}年${calM}月`;
+  const daysInM=new Date(calY,calM,0).getDate();
+  const seen=new Set();let allT=[];
+  for(let d=1;d<=daysInM;d++)getTasksForDay(calY,calM,d).forEach(t=>{const k=ckey(t);if(!seen.has(k)){seen.add(k);allT.push(t);}});
+  const done=allT.filter(t=>isChecked(t)).length,tot=allT.length,pct=tot?Math.round(done/tot*100):0;
+  $('month-bar').innerHTML=`<div class="mbar"><div><div class="mbar-lbl">${calY}年${calM}月完成进度</div><div class="prog"><div class="prog-fill" style="width:${pct}%"></div></div></div><div class="mbar-val">${done}/${tot} · ${pct}%</div></div>`;
+  const firstDay=new Date(calY,calM-1,1).getDay();
+  const prevDays=new Date(calY,calM-1,0).getDate();
+  let h=DOW_CN.map(d=>`<div class="dow">${d}</div>`).join('');
   let cells=[];
-  // Prev month padding
-  for(let i=firstDay-1;i>=0;i--) cells.push({d:prevDays-i,other:true});
-  // This month
-  for(let d=1;d<=daysInMonth;d++){
-    const tasks=getTasksForDay(calYear,calMonth,d);
-    cells.push({d,tasks,isToday:today.y===calYear&&today.m===calMonth&&today.d===d});
-  }
-  // Next month padding
-  const rem=(7-cells.length%7)%7;
-  for(let i=1;i<=rem;i++) cells.push({d:i,other:true});
-
+  for(let i=firstDay-1;i>=0;i--)cells.push({d:prevDays-i,other:true});
+  for(let d=1;d<=daysInM;d++){const tasks=getTasksForDay(calY,calM,d);cells.push({d,tasks,isToday:today.y===calY&&today.m===calM&&today.d===d});}
+  const rem=(7-cells.length%7)%7;for(let i=1;i<=rem;i++)cells.push({d:i,other:true});
   cells.forEach(cell=>{
-    if(cell.other){
-      h+=`<div class="cal-day other-month"><div class="cal-dn">${cell.d}</div></div>`;
-      return;
-    }
+    if(cell.other){h+=`<div class="cday other"><div class="cdn">${cell.d}</div></div>`;return;}
     const tasks=cell.tasks||[];
-    const hasTasks=tasks.length>0;
-    const isSel=selDay===cell.d;
-    const dots=tasks.map(t=>`<div class="cal-dot" style="background:${TC_COLOR[t.type]||TC_COLOR.transfer}"></div>`).join("");
-    h+=`<div class="cal-day ${cell.isToday?"today":""} ${hasTasks?"has-tasks":""} ${isSel?"" :""}"
-         style="${isSel?"border:1.5px solid #3b82f6;border-radius:8px":""}"
-         onclick="selDate(${cell.d})">
-      <div class="cal-dn">${cell.d}</div>
-      ${hasTasks?`<div class="cal-dots">${dots}</div>`:""}
+    const allDone=tasks.length>0&&tasks.every(t=>isChecked(t));
+    const dots=tasks.map(t=>`<div class="cdot" style="background:${TC[t.type]||TC.transfer};opacity:${isChecked(t)?.35:1}"></div>`).join('');
+    h+=`<div class="cday ${cell.isToday?'today':''} ${selDay===cell.d?'sel':''}" style="${allDone?'background:#0a2010;':''}" onclick="selDate(${cell.d})">
+      <div class="cdn">${cell.d}</div>
+      ${tasks.length?`<div class="cdots">${dots}</div>`:''}
     </div>`;
   });
-
-  document.getElementById("cal-grid").innerHTML=h;
-  renderCalTasks();
+  $('cal-grid').innerHTML=h;renderCalTasks();
 }
-
-function selDate(d){
-  selDay=(selDay===d)?null:d;
-  renderCal();
-}
-
+function selDate(d){selDay=selDay===d?null:d;renderCal();}
 function renderCalTasks(){
-  const el=document.getElementById("cal-tasks");
-  if(!selDay){el.innerHTML="";return;}
-  const tasks=getTasksForDay(calYear,calMonth,selDay);
-  if(!tasks.length){
-    el.innerHTML=`<div class="cal-task-date">${calMonth}月${selDay}日</div><div class="empty">今天没有任务 🎉</div>`;
-    return;
-  }
-  let h=`<div class="cal-task-date">${calMonth}月${selDay}日 · ${tasks.length}个任务</div>`;
+  const el=$('cal-tasks');
+  if(!selDay){el.innerHTML='';return;}
+  const tasks=getTasksForDay(calY,calM,selDay);
+  let h=`<div class="task-date-hdr">${calM}月${selDay}日${tasks.length?` · ${tasks.length}个任务`:''}</div>`;
+  if(!tasks.length){h+=`<div class="empty">今天没有任务 🎉</div>`;el.innerHTML=h;return;}
   tasks.forEach(t=>{
     const done=isChecked(t);
-    const ck=t._type==="quarterly"?"ckq":"ck";
-    const doneClass=t._type==="quarterly"?"doneq":"done";
-    h+=`<div class="task-item ${done?"done":""}" onclick="toggleTask(${JSON.stringify(t).replace(/"/g,"'")})">
-      <div class="tcheck ${done?ck:""}">${done?"✓":""}</div>
-      <div class="tbody">
-        <div class="ttop">
-          <span class="tlabel ${done?doneClass:""}">${t.label}</span>
-          ${t.amount?`<span class="tamt" style="color:${TC_COLOR[t.type]};background:${TC_COLOR[t.type]}15">${t.amount}</span>`:""}
-        </div>
-        <div class="tsub">${TC_ICON[t.type]||"📌"} ${TC_LABEL[t.type]||""}</div>
-      </div>
+    const isQ=t._freq==='quarterly',isW=(t._freq==='weekly'||t._freq==='ndays');
+    const ckCls=done?(isQ?'cq':isW?'cw':'cm'):'';
+    const dCls=done?(isQ?'dq':isW?'dw':'dm'):'';
+    const tEsc=JSON.stringify(t).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    h+=`<div class="ti clickable ${done?'done':''}" onclick="toggleTask('${tEsc}')">
+      <div class="tck ${ckCls}">${done?'✓':''}</div>
+      <div class="tbody"><div class="ttop">
+        <span class="tlbl ${dCls}">${t.label}</span>
+        ${t.amount?`<span class="tamt" style="color:${TC[t.type]};background:${TC[t.type]}22">${t.amount}</span>`:''}
+      </div><div class="tsub">${TI[t.type]||'📌'} ${TL[t.type]||''}</div></div>
     </div>`;
   });
   el.innerHTML=h;
 }
 
-// ──────────────────────────────────────────────
-//  Piggy Bank
-// ──────────────────────────────────────────────
+// ── TASK OVERVIEW ──
+function renderTaskOv(){
+  if(!D){$('tov-body').innerHTML='';return;}
+  const sections=[
+    {key:'monthlyTasks',  label:'📅 每月任务',   freq:'monthly'},
+    {key:'weeklyTasks',   label:'🗓 每周任务',   freq:'weekly'},
+    {key:'quarterlyTasks',label:'🔄 每季度任务', freq:'quarterly'},
+    {key:'ndaysTasks',    label:'⏱ 每N天任务',  freq:'ndays'},
+    {key:'onceTasks',     label:'⚡ 一次性任务', freq:'once'},
+  ];
+  let h='';
+  sections.forEach(sec=>{
+    const tasks=D[sec.key]||[];
+    const collapsed=!!US.tovCollapsed[sec.key];
+    h+=`<div class="tov-sec-hdr ${collapsed?'':'open'}" onclick="toggleTovSec('${sec.key}')">
+      <span class="tov-sec-title">${sec.label}<span class="tov-badge">${tasks.length}</span></span>
+      <span class="tov-chevron ${collapsed?'':'open'}">›</span>
+    </div>`;
+    h+=`<div class="tov-sec-body ${collapsed?'hidden':''}" id="tov-${sec.key}">`;
+    if(!tasks.length)h+=`<div class="empty" style="padding:8px 0">暂无</div>`;
+    tasks.forEach(t=>{
+      h+=`<div class="ti"><div class="tbody"><div class="ttop">
+        <span class="tlbl">${t.label}</span>
+        ${t.amount?`<span class="tamt" style="color:${TC[t.type]||TC.transfer};background:${TC[t.type]||TC.transfer}22">${t.amount}</span>`:''}
+      </div><div class="tsub">${TI[t.type]||'📌'} ${freqDesc(t,sec.freq)}</div></div>
+      <button class="t-edit-btn" onclick="openTaskSheet('${t.id}','${sec.key}')">✏️</button></div>`;
+    });
+    h+=`</div>`;
+  });
+  $('tov-body').innerHTML=h;
+}
+function toggleTovSec(key){
+  US.tovCollapsed[key]=!US.tovCollapsed[key];saveUS();renderTaskOv();
+}
+function freqDesc(t,freq){
+  if(freq==='monthly')return`每月${t.day}号`;
+  if(freq==='weekly')return`每${DOW_FULL[t.weekday]||'?'}`;
+  if(freq==='quarterly')return`每季度${(t.months||[]).join('/')}月第${t.day}号`;
+  if(freq==='ndays')return`每${t.ndays}天，从${t.startDate}起`;
+  if(freq==='once')return`${t.date} 一次性`;
+  return'';
+}
+
+// ── TASK SHEET ──
+function toggleTgl(id){$(id).classList.toggle('on');}
+function addHoliday(){const v=$('holiday-input').value;if(!v)return;if(!tmpHolidays.includes(v))tmpHolidays.push(v);$('holiday-input').value='';renderHolidayList();}
+function removeHoliday(d){tmpHolidays=tmpHolidays.filter(x=>x!==d);renderHolidayList();}
+function renderHolidayList(){
+  $('holiday-list').innerHTML=tmpHolidays.length
+    ?tmpHolidays.sort().map(d=>`<div class="holiday-item"><span>${d}</span><button class="holiday-del" onclick="removeHoliday('${d}')">✕</button></div>`).join('')
+    :`<div style="font-size:11px;color:#475569;padding:4px 0">暂无自定义休市日期</div>`;
+}
+function onFreqChange(){
+  const freq=$('tf-freq').value;
+  ['monthly','weekly','quarterly','ndays','once'].forEach(f=>$('fo-'+f).style.display=f===freq?'block':'none');
+}
+function onNdaysChange(){$('tf-ndays-custom-wrap').style.display=$('tf-ndays').value==='custom'?'block':'none';}
+
+function openTaskSheet(id,section){
+  editTaskId=id;editTaskSection=section||null;
+  let task=null;
+  if(id){const keys=['monthlyTasks','weeklyTasks','quarterlyTasks','ndaysTasks','onceTasks'];for(const k of keys){const t=(D[k]||[]).find(x=>x.id===id);if(t){task=t;editTaskSection=k;break;}}}
+  $('sh-task-ttl').textContent=task?'编辑任务':'添加任务';
+  $('tf-label').value=task?.label||'';
+  $('tf-amount').value=task?.amount||'';
+  $('tf-type').value=task?.type||'transfer';
+  $('tf-del').style.display=id?'block':'none';
+  let freq='monthly';
+  if(editTaskSection==='weeklyTasks')freq='weekly';
+  else if(editTaskSection==='quarterlyTasks')freq='quarterly';
+  else if(editTaskSection==='ndaysTasks')freq='ndays';
+  else if(editTaskSection==='onceTasks')freq='once';
+  $('tf-freq').value=freq;
+  $('tf-day').value=task?.day||1;
+  $('tf-weekday').value=task?.weekday??1;
+  $('tf-qday').value=task?.day||1;
+  const ndv=String(task?.ndays||7);
+  const ndSel=['3','5','7','10','14','30'];
+  $('tf-ndays').value=ndSel.includes(ndv)?ndv:'custom';
+  if(!ndSel.includes(ndv)){$('tf-ndays-custom').value=ndv;$('tf-ndays-custom-wrap').style.display='block';}
+  else $('tf-ndays-custom-wrap').style.display='none';
+  const now=new Date();
+  const todayStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  $('tf-ndays-start').value=task?.startDate||todayStr;
+  $('tf-once-date').value=task?.date||todayStr;
+  $('tf-months').querySelectorAll('input[type=checkbox]').forEach(cb=>{cb.checked=(task?.months||[1,4,7,10]).includes(Number(cb.value));});
+  $('tgl-postpone').className='tgl'+(task?.postpone?' on':'');
+  $('tgl-weekend').className='tgl'+(task?.weekendOff!==false?' on':'');
+  tmpHolidays=[...(task?.holidays||[])];renderHolidayList();
+  onFreqChange();
+  $('sh-task').style.display='flex';
+}
+function taskSave(){
+  if(!D)return;
+  const label=$('tf-label').value.trim();if(!label){alert('请填写任务名称');return;}
+  const freq=$('tf-freq').value;
+  const postpone=$('tgl-postpone').classList.contains('on');
+  const weekendOff=$('tgl-weekend').classList.contains('on');
+  let task={id:editTaskId||('t-'+Date.now()),label,type:$('tf-type').value,amount:$('tf-amount').value.trim(),postpone,weekendOff,holidays:[...tmpHolidays]};
+  let sectionKey;
+  if(freq==='monthly'){sectionKey='monthlyTasks';task.day=parseInt($('tf-day').value)||1;}
+  else if(freq==='weekly'){sectionKey='weeklyTasks';task.weekday=parseInt($('tf-weekday').value);}
+  else if(freq==='quarterly'){sectionKey='quarterlyTasks';task.day=parseInt($('tf-qday').value)||1;task.months=Array.from($('tf-months').querySelectorAll('input:checked')).map(cb=>Number(cb.value));}
+  else if(freq==='ndays'){sectionKey='ndaysTasks';const ndv=$('tf-ndays').value;task.ndays=ndv==='custom'?parseInt($('tf-ndays-custom').value)||7:parseInt(ndv);task.startDate=$('tf-ndays-start').value;}
+  else{sectionKey='onceTasks';task.date=$('tf-once-date').value;}
+  if(!D[sectionKey])D[sectionKey]=[];
+  if(editTaskId&&editTaskSection&&editTaskSection!==sectionKey)D[editTaskSection]=D[editTaskSection].filter(t=>t.id!==editTaskId);
+  const idx=(D[sectionKey]||[]).findIndex(t=>t.id===editTaskId);
+  if(idx>=0)D[sectionKey][idx]=task;else D[sectionKey].push(task);
+  saveD();closeSheet('sh-task');renderTaskOv();renderCal();
+}
+function taskDelete(){
+  if(!editTaskId||!confirm('确定删除这个任务？'))return;
+  ['monthlyTasks','weeklyTasks','quarterlyTasks','ndaysTasks','onceTasks'].forEach(k=>{if(D[k])D[k]=D[k].filter(t=>t.id!==editTaskId);});
+  saveD();closeSheet('sh-task');renderTaskOv();renderCal();
+}
+
+// ── PIGGY ──
+function openPigCardSheet(){
+  const cards=allCards().filter(c=>gst(c.id)!=='pending');
+  const NC=NC_MAP;
+  $('pig-card-list').innerHTML=cards.map(c=>{
+    const nc=NC[c.network]||{c:'#94a3b8',b:'#1e293b'};
+    const isSel=US.pigCard===c.id;
+    return `<div onclick="setPigCard('${c.id}')" style="padding:11px;border-radius:9px;border:1.5px solid ${isSel?'#3b82f6':'#334155'};background:${isSel?'#0f1f3d':'transparent'};margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:10px">
+      ${c.noCard?'':'<span class="nbadge" style="background:'+nc.b+';color:'+nc.c+'">'+c.network+'</span>'}
+      <span style="font-size:13px;font-weight:600">${c.bank}${c.tail?' *'+c.tail:''}</span>
+    </div>`;
+  }).join('');
+  $('sh-pig-card').style.display='flex';
+}
+function setPigCard(id){US.pigCard=id;saveUS();closeSheet('sh-pig-card');renderPiggy();}
 function pigTotal(){return US.pig.reduce((s,e)=>s+e.amount,0);}
-
 function pigAdd(){
-  const amt=parseFloat(document.getElementById("pig-amt").value);
-  if(!amt||amt===0)return;
-  const desc=document.getElementById("pig-desc").value.trim();
-  const now=new Date();
-  const entry={id:Date.now(),amount:amt,desc:desc||"",date:now.toLocaleDateString("zh-CN"),ts:now.toISOString()};
-  US.pig=[entry,...US.pig];
-  document.getElementById("pig-amt").value="";
-  document.getElementById("pig-desc").value="";
-  saveUS();renderPiggy();
+  const amt=parseFloat($('pig-amt').value);if(!amt||amt===0)return;
+  const desc=$('pig-desc').value.trim();const now=new Date();
+  US.pig=[{id:Date.now(),amount:amt,desc,cardId:US.pigCard,date:now.toLocaleDateString('zh-CN'),ts:now.toISOString()},...US.pig];
+  $('pig-amt').value='';$('pig-desc').value='';saveUS();renderPiggy();
 }
-
 function pigOut(){
-  const amt=parseFloat(document.getElementById("pig-amt").value);
-  if(!amt||amt<=0){alert("请输入转出金额");return;}
-  const total=pigTotal();
-  if(amt>total){alert(`余额不足，当前余额 ¥${total}`);return;}
-  const desc=document.getElementById("pig-desc").value.trim()||"转出";
-  const now=new Date();
-  const entry={id:Date.now(),amount:-amt,desc:desc,date:now.toLocaleDateString("zh-CN"),ts:now.toISOString()};
-  US.pig=[entry,...US.pig];
-  document.getElementById("pig-amt").value="";
-  document.getElementById("pig-desc").value="";
-  saveUS();renderPiggy();
+  const amt=parseFloat($('pig-amt').value);
+  if(!amt||amt<=0){alert('请输入转出金额');return;}
+  if(amt>pigTotal()){alert(`余额不足，当前 ¥${pigTotal()}`);return;}
+  const desc=$('pig-desc').value.trim()||'转出';const now=new Date();
+  US.pig=[{id:Date.now(),amount:-amt,desc,cardId:US.pigCard,date:now.toLocaleDateString('zh-CN'),ts:now.toISOString()},...US.pig];
+  $('pig-amt').value='';$('pig-desc').value='';saveUS();renderPiggy();
 }
-
-function pigDelete(id){
-  if(!confirm("确定删除这条记录？")) return;
-  US.pig=US.pig.filter(e=>e.id!==id);
-  saveUS();renderPiggy();
-}
-
 function pigEdit(id){
-  editPigId=id;
-  const e=US.pig.find(x=>x.id===id);
-  document.getElementById("edit-amt").value=Math.abs(e.amount);
-  document.getElementById("edit-desc").value=e.desc||"";
-  document.getElementById("pig-sheet").style.display="flex";
+  editPigId=id;const e=US.pig.find(x=>x.id===id);
+  $('pe-amt').value=Math.abs(e.amount);$('pe-desc').value=e.desc||'';
+  $('sh-pig').style.display='flex';
 }
-
 function pigSaveEdit(){
-  const amt=parseFloat(document.getElementById("edit-amt").value);
-  if(!amt)return;
-  const desc=document.getElementById("edit-desc").value.trim();
+  const amt=parseFloat($('pe-amt').value);if(!amt)return;
   const idx=US.pig.findIndex(e=>e.id===editPigId);
-  if(idx>=0){
-    const orig=US.pig[idx];
-    US.pig[idx]={...orig,amount:orig.amount<0?-amt:amt,desc};
-  }
-  saveUS();closeSheet("pig-sheet");renderPiggy();
+  if(idx>=0){const orig=US.pig[idx];US.pig[idx]={...orig,amount:orig.amount<0?-amt:amt,desc:$('pe-desc').value.trim()};}
+  saveUS();closeSheet('sh-pig');renderPiggy();
 }
-
+function pigDel(id){if(!confirm('确定删除？'))return;US.pig=US.pig.filter(e=>e.id!==id);saveUS();renderPiggy();}
 function renderPiggy(){
-  const total=pigTotal();
-  document.getElementById("pig-total").textContent="¥"+total.toLocaleString();
-  if(!US.pig.length){
-    document.getElementById("pig-log-lbl").style.display="none";
-    document.getElementById("pig-log").innerHTML=`<div class="empty">还没有记录</div>`;
-    return;
-  }
-  document.getElementById("pig-log-lbl").style.display="block";
-  document.getElementById("pig-log").innerHTML=US.pig.map(e=>{
-    const isOut=e.amount<0;
-    return `<div class="pig-entry">
-      <div class="pig-entry-info">
-        <div class="pig-entry-amt" style="color:${isOut?"#f87171":"#f0c040"}">${isOut?"－":"＋"}¥${Math.abs(e.amount).toLocaleString()}</div>
-        ${e.desc?`<div class="pig-entry-desc">${e.desc}</div>`:""}
-        <div class="pig-entry-date">${e.date}</div>
+  $('pig-tot').textContent='¥'+pigTotal().toLocaleString();
+  $('pig-card-name').textContent=getCardName(US.pigCard)||'未关联卡片';
+  $('pig-lbl').textContent=US.pig.length?'记录':'';
+  $('pig-log').innerHTML=!US.pig.length?'<div class="empty">还没有记录</div>':US.pig.map(e=>{
+    const isOut=e.amount<0,cn=getCardName(e.cardId);
+    return `<div class="pentry">
+      <div class="pentry-info">
+        <div class="pamt" style="color:${isOut?'#f87171':'#f0c040'}">${isOut?'－':'＋'}¥${Math.abs(e.amount).toLocaleString()}</div>
+        ${e.desc?`<div class="pdesc">${e.desc}</div>`:''}
+        ${cn?`<span class="pcard-tag">🏦 ${cn}</span>`:''}
+        <div class="pdate">${e.date}</div>
       </div>
-      <div class="pig-actions">
-        <button class="pig-edit-btn" onclick="pigEdit(${e.id})">编辑</button>
-        <button class="pig-del-btn" onclick="pigDelete(${e.id})">删除</button>
+      <div class="pacts">
+        <button class="p-ebtn" onclick="pigEdit(${e.id})">编辑</button>
+        <button class="p-dbtn" onclick="pigDel(${e.id})">删除</button>
       </div>
     </div>`;
-  }).join("");
+  }).join('');
 }
 
-// ──────────────────────────────────────────────
-//  Data page
-// ──────────────────────────────────────────────
+// ── DATA PAGE ──
 function renderDataPage(){
   if(!D)return;
-  const all=allCards();
-  const mt=(D.monthlyTasks||[]).length+(D.quarterlyTasks||[]).length;
-  const active=all.filter(c=>gst(c.id)==="active").length;
-  const pigBal=pigTotal();
-  document.getElementById("data-stats").innerHTML=`
-    <div class="stat-box"><div class="stat-num">${all.length}</div><div class="stat-lbl">卡片总数</div></div>
-    <div class="stat-box"><div class="stat-num">${mt}</div><div class="stat-lbl">任务总数</div></div>
-    <div class="stat-box"><div class="stat-num">${active}</div><div class="stat-lbl">活跃账户</div></div>
-    <div class="stat-box"><div class="stat-num" style="font-size:16px">¥${pigBal}</div><div class="stat-lbl">储蓄罐余额</div></div>
-  `;
+  const tot=(D.monthlyTasks||[]).length+(D.weeklyTasks||[]).length+(D.quarterlyTasks||[]).length+(D.ndaysTasks||[]).length+(D.onceTasks||[]).length;
+  const cards=allCards();
+  $('data-stats').innerHTML=`
+    <div class="sbox"><div class="snum">${cards.length}</div><div class="slbl">卡片总数</div></div>
+    <div class="sbox"><div class="snum">${tot}</div><div class="slbl">任务总数</div></div>
+    <div class="sbox"><div class="snum">${cards.filter(c=>gst(c.id)==='active').length}</div><div class="slbl">活跃账户</div></div>
+    <div class="sbox"><div class="snum" style="font-size:15px">¥${pigTotal()}</div><div class="slbl">储蓄罐余额</div></div>`;
 }
 
-// ──────────────────────────────────────────────
-//  Tabs / Utils
-// ──────────────────────────────────────────────
+// ── TABS ── only show header buttons on cards tab
 function ST(tab){
   curTab=tab;
-  ["cards","cal","piggy","data"].forEach(t=>{
-    document.getElementById("p-"+t).style.display=t===tab?"block":"none";
-  });
-  document.querySelectorAll(".tab").forEach((el,i)=>{
-    el.className="tab"+(["cards","cal","piggy","data"][i]===tab?" on":"");
-  });
-  if(tab==="data")renderDataPage();
+  ['cards','cal','piggy','data'].forEach(t=>$('p-'+t).style.display=t===tab?'block':'none');
+  document.querySelectorAll('.tab').forEach((el,i)=>el.className='tab'+((['cards','cal','piggy','data'][i]===tab)?' on':''));
+  $('hdr-btns').style.display=(tab==='cards'&&D)?'flex':'none';
+  if(tab==='data')renderDataPage();
 }
+function closeSheet(id){$(id).style.display='none';}
 
-function closeSheet(id){document.getElementById(id).style.display="none";}
-
-// ──────────────────────────────────────────────
-//  PWA
-// ──────────────────────────────────────────────
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{
-    const sw=`const C='cm-v3';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))))`;
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(()=>{});
+// ── PWA ──
+if('serviceWorker'in navigator){
+  window.addEventListener('load',()=>{
+    const sw=`const C='cmv7';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))))`;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
   });
 }
 let dp;
-window.addEventListener("beforeinstallprompt",e=>{
+window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault();dp=e;
-  const b=document.createElement("div");
+  const b=document.createElement('div');
   b.innerHTML=`<div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1e40af;color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;cursor:pointer;box-shadow:0 4px 20px #0008;z-index:999;white-space:nowrap" onclick="ia()">📲 安装到桌面</div>`;
   document.body.appendChild(b);setTimeout(()=>b.remove(),8000);
 });
